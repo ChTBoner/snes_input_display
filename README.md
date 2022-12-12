@@ -12,6 +12,8 @@ Any feedback is welcome.
 ## Requirements
 [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/)
 
+Check requirements.txt
+
 ## Credits
 
 Controller Image credits: TotoroMatt (https://www.deviantart.com/totoromatt/art/SNES-Pad-Europe-Super-Nintendo-549248286)

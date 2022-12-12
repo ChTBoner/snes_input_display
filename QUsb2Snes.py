@@ -4,8 +4,8 @@ TODO
 import json
 from bitstring import BitArray
 
-
 URI = "ws://localhost:8080"
+
 
 async def call_websocket(websocket, data: dict):
     """
@@ -15,7 +15,6 @@ async def call_websocket(websocket, data: dict):
     results = await websocket.recv()
     return results
     
-
 
 async def attach_device(websocket):
     """
@@ -27,8 +26,6 @@ async def attach_device(websocket):
         "Space": "SNES",
         "Operands": [f"{device}"]
     }
-
-    print(data)
 
     # attach doesn't send a return code
     await websocket.send(json.dumps(data))
@@ -74,4 +71,3 @@ async def get_inputs(websocket):
     input1 = await get_address(websocket, f'F5{controller1_inputs_addr}', 2)
 
     return BitArray(input1)
-
