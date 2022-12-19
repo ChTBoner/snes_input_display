@@ -7,12 +7,13 @@ import asyncio
 import pygame
 from websockets.client import connect
 import websockets.exceptions
-from QUsb2Snes import attach_device, get_inputs
+from py2snes import snes
+# from QUsb2Snes import attach_device, get_inputs
 
 CONTROLLER_IMAGE = pygame.image.load(PurePath("assets", "snes_controller.png"))
 WIN = pygame.display.set_mode((CONTROLLER_IMAGE.get_width(), CONTROLLER_IMAGE.get_height()))
 
-URI = "ws://localhost:8080"
+# URI = "ws://localhost:8080"
 
 PRESSED_COLOR = (255, 59, 0, 1)
 DPAD_INPUT_SIZE = 40
@@ -79,17 +80,25 @@ async def main():
     Main function
     Connects to QUsb2Snes and runs the main loop.
     """
+    client = snes()
+    await client.connect()
     try:
-        async with connect(URI) as qusb2snes:
-            await attach_device(qusb2snes)
-            run = True
+        device_list = await client.DeviceList()
+        print(device_list)
+        await client.Attach(device_list[0])
+        info = await client.Info()
+        print(info)
+    # try:
+    #     async with connect(URI) as qusb2snes:
+    #         await attach_device(qusb2snes)
+    #         run = True
 
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        run = False
-                inputs = await get_inputs(qusb2snes)
-                draw_window(inputs)
+    #         while run:
+    #             for event in pygame.event.get():
+    #                 if event.type == pygame.QUIT:
+    #                     run = False
+    #             inputs = await get_inputs(qusb2snes)
+    #             draw_window(inputs)
     except OSError:
         sys_exit("Could not connect to QUsb2Snes")
     except websockets.exceptions.ConnectionClosed:
