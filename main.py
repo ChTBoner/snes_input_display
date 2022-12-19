@@ -5,18 +5,15 @@ from pathlib import PurePath
 from sys import exit as sys_exit
 import asyncio
 import pygame
-# from websockets.client import connect
-# import websockets.exceptions
 from py2snes import snes, WRAM_START, usb2snesException
 from bitstring import BitArray
 
-# from QUsb2Snes import attach_device, get_inputs
 
 CONTROLLER_IMAGE = pygame.image.load(PurePath("assets", "snes_controller.png"))
 WIN = pygame.display.set_mode((CONTROLLER_IMAGE.get_width(), CONTROLLER_IMAGE.get_height()))
 
-# URI = "ws://localhost:8080"
 INPUTS_ADDR = 0x008B
+
 PRESSED_COLOR = (255, 59, 0, 1)
 DPAD_INPUT_SIZE = 40
 ROUND_BUTTON_RADIUS = 20
