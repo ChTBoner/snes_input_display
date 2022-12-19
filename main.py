@@ -1,7 +1,7 @@
 """
 Super Metroid input controller
 """
-from os import path
+from pathlib import PurePath
 from sys import exit as sys_exit
 import asyncio
 import pygame
@@ -9,7 +9,7 @@ from websockets.client import connect
 import websockets.exceptions
 from QUsb2Snes import attach_device, get_inputs
 
-CONTROLLER_IMAGE = pygame.image.load(path.join("assets", "snes_controller.png"))
+CONTROLLER_IMAGE = pygame.image.load(PurePath("assets", "snes_controller.png"))
 WIN = pygame.display.set_mode((CONTROLLER_IMAGE.get_width(), CONTROLLER_IMAGE.get_height()))
 
 URI = "ws://localhost:8080"
