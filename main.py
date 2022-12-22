@@ -1,18 +1,18 @@
 """
 Super Metroid input controller
 """
-from os import path
+from pathlib import PurePath
 from sys import exit as sys_exit
 import asyncio
 import pygame
-from websockets.client import connect
-import websockets.exceptions
-from QUsb2Snes import attach_device, get_inputs
+from py2snes import snes, WRAM_START, usb2snesException
+from bitstring import BitArray
 
-CONTROLLER_IMAGE = pygame.image.load(path.join("assets", "snes_controller.png"))
+
+CONTROLLER_IMAGE = pygame.image.load(PurePath("assets", "snes_controller.png"))
 WIN = pygame.display.set_mode((CONTROLLER_IMAGE.get_width(), CONTROLLER_IMAGE.get_height()))
 
-URI = "ws://localhost:8080"
+INPUTS_ADDR = 0x008B
 
 PRESSED_COLOR = (255, 59, 0, 1)
 DPAD_INPUT_SIZE = 40
@@ -79,22 +79,25 @@ async def main():
     Main function
     Connects to QUsb2Snes and runs the main loop.
     """
+    client = snes()
+    await client.connect()
     try:
-        async with connect(URI) as qusb2snes:
-            await attach_device(qusb2snes)
-            run = True
+        device_list = await client.DeviceList()
+        print(device_list)
+        await client.Attach(device_list[0])
+        run = True
 
-            while run:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        run = False
-                inputs = await get_inputs(qusb2snes)
-                draw_window(inputs)
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+            inputs = await client.GetAddress(WRAM_START + INPUTS_ADDR, 2)
+            draw_window(BitArray(inputs))
+
     except OSError:
         sys_exit("Could not connect to QUsb2Snes")
-    except websockets.exceptions.ConnectionClosed:
-        sys_exit("Connection to Sd2Snes failed.")
-
+    except usb2snesException:
+        sys_exit("Could not connect to QUsb2Snes")
 
 if __name__ == "__main__":
     asyncio.run(main())
