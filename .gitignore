@@ -160,3 +160,8 @@ cython_debug/
 #.idea/
 
 .idea
+
+# Added by cargo
+
+/target
+cargo.lock
