@@ -5,6 +5,22 @@ pub mod controller {
     use bitvec::prelude::*;
     use crate::qusb2snes::usb2snes::SyncClient;
 
+    pub enum ControllerEvents {
+        A,
+        B,
+        X,
+        Y,
+        Select,
+        Start,
+        Up,
+        Down,
+        Left,
+        Right,
+        L,
+        R,
+
+    }
+
     #[derive(Deserialize, Debug)]
     pub struct ButtonLayout {
         pub b: usize,
@@ -35,48 +51,50 @@ pub mod controller {
             c
         }
 
-        pub fn pushed(&self, client: &mut SyncClient ) {
+        pub fn pushed(&self, client: &mut SyncClient ) -> Vec<ControllerEvents> {
             let inputs = client.get_address(self.address, self.size);
             let mut input_string = "".to_string();
             let bits = inputs.view_bits::<Msb0>();
+            let mut controller_events = Vec::new();
+
             if bits[self.button_layout.a] {
-                input_string.push_str("A ");
+                controller_events.push(ControllerEvents::A);
             };
             if bits[self.button_layout.x] {
-                input_string.push_str("X ");
+                controller_events.push(ControllerEvents::X);
             };
             if bits[self.button_layout.b] {
-                input_string.push_str("B ");
+                controller_events.push(ControllerEvents::B);
             };
             if bits[self.button_layout.y] {
-                input_string.push_str("Y ");
+                controller_events.push(ControllerEvents::Y);
             };
             if bits[self.button_layout.select] {
-                input_string.push_str("Select ");
+                controller_events.push(ControllerEvents::Select);
             };
             if bits[self.button_layout.start] {
-                input_string.push_str("Start ");
+                controller_events.push(ControllerEvents::Start);
             };
             if bits[self.button_layout.up] {
-                input_string.push_str("Up ");
+                controller_events.push(ControllerEvents::Up);
             };
             if bits[self.button_layout.down] {
-                input_string.push_str("Down ");
+                controller_events.push(ControllerEvents::Down);
             };
             if bits[self.button_layout.left] {
-                input_string.push_str("Left ");
+                controller_events.push(ControllerEvents::Left);
             };
             if bits[self.button_layout.right] {
-                input_string.push_str("Right ");
+                controller_events.push(ControllerEvents::Right);
             };
             if bits[self.button_layout.l] {
-                input_string.push_str("L ");
+                controller_events.push(ControllerEvents::L);
             };
             if bits[self.button_layout.r] {
-                input_string.push_str("R ");
+                controller_events.push(ControllerEvents::R);
             };
-            println!("{}", input_string)
-            }
+            controller_events
+        }
     }
 }
 
