@@ -15,4 +15,6 @@ bitarray = "0.10.0"
 bit-array = "0.4.4"
 bitvec = "1.0.1"
 
+quick-xml = { version = "0.28.1", features = ["overlapped-lists", "serialize"] }
+
 

@@ -20,7 +20,7 @@
 #[allow(dead_code)]
 
 pub mod usb2snes {
-
+    // const INPUT_ADDRESS: u32 = 0xF5008B;
     use serde::{Deserialize, Serialize};
     use strum_macros::Display;
     use websocket::sync::stream::TcpStream;

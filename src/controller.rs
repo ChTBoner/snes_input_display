@@ -1,8 +1,9 @@
 pub mod controller {
-    use std::fs;
+    use bitvec::prelude::*;
     use serde::Deserialize;
     use serde_json;
-    use bitvec::prelude::*;
+    use std::{fs, path::Path};
+
     use crate::qusb2snes::usb2snes::SyncClient;
 
     pub enum ControllerEvents {
@@ -18,7 +19,6 @@ pub mod controller {
         Right,
         L,
         R,
-
     }
 
     #[derive(Deserialize, Debug)]
@@ -34,26 +34,24 @@ pub mod controller {
         pub a: usize,
         pub x: usize,
         pub l: usize,
-        pub r: usize
+        pub r: usize,
     }
 
     #[derive(Deserialize, Debug)]
     pub struct Controller {
         pub address: u32,
         pub size: usize,
-        pub button_layout: ButtonLayout
+        pub button_layout: ButtonLayout,
     }
 
     impl Controller {
-        pub fn new(path: String) -> Self {
-            let data = fs::read_to_string(path).expect("Unable to read file");
-            let c: Self = serde_json::from_str(&data).expect("Unable to parse");
-            c
+        pub fn new(config_path: &Path) -> Self {
+            let config_data = fs::read_to_string(config_path).expect("Unable to config file");
+            serde_json::from_str(&config_data).expect("Unable to parse")
         }
 
-        pub fn pushed(&self, client: &mut SyncClient ) -> Vec<ControllerEvents> {
+        pub fn pushed(&self, client: &mut SyncClient) -> Vec<ControllerEvents> {
             let inputs = client.get_address(self.address, self.size);
-            let mut input_string = "".to_string();
             let bits = inputs.view_bits::<Msb0>();
             let mut controller_events = Vec::new();
 
@@ -97,4 +95,3 @@ pub mod controller {
         }
     }
 }
-
