@@ -6,6 +6,7 @@ pub mod skin {
     use std::fs;
     use std::io::Read;
     use std::path::Path;
+    use std::path::PathBuf;
 
     #[derive(Debug)]
     pub struct Skin {
@@ -14,17 +15,23 @@ pub mod skin {
         pub console: String,
         pub backgrounds: HashMap<String, String>,
         pub buttons: HashMap<String, Button>,
+        pub directory: PathBuf,
     }
 
     impl Skin {
         pub fn new(file_path: &Path) -> Skin {
             let file = Skin::load_file(file_path);
 
-            let mut reader = Reader::from_str(&file);
-
-            let mut backgrounds: Vec<Background> = Vec::new();
+            let mut reader = Reader::from_str(&file);            let mut backgrounds: Vec<Background> = Vec::new();
             let mut buttons: Vec<Button> = Vec::new();
-            let mut skin = Skin::empty();
+            let mut skin = Self {
+                name: String::new(),
+                console: String::new(),
+                author: String::new(),
+                backgrounds: HashMap::new(),
+                buttons: HashMap::new(),
+                directory: file_path.parent().unwrap().to_owned(),
+            };
 
             loop {
                 // dbg!(&reader.read_event());
@@ -65,6 +72,7 @@ pub mod skin {
                 author: String::new(),
                 backgrounds: HashMap::new(),
                 buttons: HashMap::new(),
+                directory: PathBuf::new(),
             }
         }
 

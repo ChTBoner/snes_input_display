@@ -14,7 +14,14 @@ clearscreen = "2.0.0"
 bitarray = "0.10.0"
 bit-array = "0.4.4"
 bitvec = "1.0.1"
-
 quick-xml = { version = "0.28.1", features = ["overlapped-lists", "serialize"] }
+image = "0.24.6"
+imageinfo = "0.7.7"
+
+[dependencies.sdl2]
+version = "*"
+default-features = false
+features = ["image"]
+
 
 
