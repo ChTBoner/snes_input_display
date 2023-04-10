@@ -64,11 +64,12 @@ fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
     let texture_creator = canvas.texture_creator();
-    let texture = texture_creator.load_texture(selected_skin_path)?;
-
-    canvas.copy(&texture, None, None)?;
-    canvas.present();
+    // canvas.present();
+    let _texture = texture_creator.load_texture(&selected_skin_path)?;
     'mainloop: loop {
+        canvas.clear();
+    
+        // canvas.copy(&texture, None, None)?;
         for event in sdl_context.event_pump()?.poll_iter() {
             match event {
                 Event::Quit { .. }
@@ -76,9 +77,19 @@ fn main() -> Result<(), String> {
                     keycode: Option::Some(Keycode::Escape),
                     ..
                 } => break 'mainloop,
+                Event::KeyDown {
+                    keycode: Option::Some(Keycode::Space), ..
+                } => {
+                    let button_path = Path::new(&skin.directory).join(&skin.buttons["a"].image);
+                    let button_texture = texture_creator.load_texture(&button_path)?;
+                    println!("SPACE");
+                    canvas.copy(&button_texture, None, None)?;
+
+                },
                 _ => {}
             }
         }
+        canvas.present();
     }
     /* 'mainloop: loop {
         let events = controller.pushed(&mut usb2snes);

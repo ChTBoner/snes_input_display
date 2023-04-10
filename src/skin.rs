@@ -10,9 +10,7 @@ pub mod skin {
 
     #[derive(Debug)]
     pub struct Skin {
-        pub name: String,
-        pub author: String,
-        pub console: String,
+        pub metadata: HashMap<String, String>,
         pub backgrounds: HashMap<String, String>,
         pub buttons: HashMap<String, Button>,
         pub directory: PathBuf,
@@ -22,21 +20,15 @@ pub mod skin {
         pub fn new(file_path: &Path) -> Skin {
             let file = Skin::load_file(file_path);
 
-            let mut reader = Reader::from_str(&file);            let mut backgrounds: Vec<Background> = Vec::new();
+            let mut reader = Reader::from_str(&file);
+            let mut backgrounds: Vec<Background> = Vec::new();
             let mut buttons: Vec<Button> = Vec::new();
-            let mut skin = Self {
-                name: String::new(),
-                console: String::new(),
-                author: String::new(),
-                backgrounds: HashMap::new(),
-                buttons: HashMap::new(),
-                directory: file_path.parent().unwrap().to_owned(),
-            };
+            let mut metadata: HashMap<String, String> = HashMap::new();
 
             loop {
                 // dbg!(&reader.read_event());
                 match reader.read_event() {
-                    Ok(Event::Start(t)) => skin.update(t),
+                    Ok(Event::Start(t)) => metadata = parse_attributes(t),
                     Ok(Event::Empty(t)) => match t.name().as_ref() {
                         b"background" => {
                             let bg = Background::new(t);
@@ -53,9 +45,12 @@ pub mod skin {
                     _ => (),
                 }
             }
-            skin.parse_backgrounds(backgrounds);
-            skin.parse_buttons(buttons);
-            skin
+            Self {
+                metadata: metadata,
+                backgrounds: Skin::parse_backgrounds(backgrounds),
+                buttons: Skin::parse_buttons(buttons),
+                directory: file_path.parent().unwrap().to_owned(),
+            }
         }
 
         fn load_file(path: &Path) -> String {
@@ -65,35 +60,20 @@ pub mod skin {
             text
         }
 
-        fn empty() -> Self {
-            Self {
-                name: String::new(),
-                console: String::new(),
-                author: String::new(),
-                backgrounds: HashMap::new(),
-                buttons: HashMap::new(),
-                directory: PathBuf::new(),
+        fn parse_backgrounds(backgrounds_vec: Vec<Background>) -> HashMap<String, String> {
+            let mut backgrounds = HashMap::new();
+            for background in backgrounds_vec {
+                backgrounds.insert(background.name.to_lowercase(), background.image);
             }
+            backgrounds
         }
 
-        fn update(&mut self, t: BytesStart) {
-            let attributes = parse_attributes(t);
-            self.name = attributes["name"].to_owned();
-            self.author = attributes["author"].to_owned();
-            self.console = attributes["type"].to_owned();
-        }
-
-        fn parse_backgrounds(&mut self, backgrounds: Vec<Background>) {
-            for background in backgrounds {
-                self.backgrounds
-                    .insert(background.name.to_lowercase(), background.image);
+        fn parse_buttons(buttons_vec: Vec<Button>) -> HashMap<String, Button> {
+            let mut buttons = HashMap::new();
+            for button in buttons_vec {
+                buttons.insert(button.name.to_owned(), button);
             }
-        }
-
-        fn parse_buttons(&mut self, buttons: Vec<Button>) {
-            for button in buttons {
-                self.buttons.insert(button.name.to_owned(), button);
-            }
+            buttons
         }
     }
 
