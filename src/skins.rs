@@ -1,4 +1,5 @@
 pub mod skin {
+    use imageinfo::ImageInfo;
     use quick_xml::events::{BytesStart, Event};
     use quick_xml::reader::Reader;
     use sdl2::rect::Rect;
@@ -7,7 +8,6 @@ pub mod skin {
     use std::io::Read;
     use std::path::Path;
     use std::path::PathBuf;
-    use imageinfo::ImageInfo;
 
     #[derive(Debug)]
     pub struct Skin {
@@ -33,7 +33,7 @@ pub mod skin {
                     Ok(Event::Start(t)) => metadata = parse_attributes(t),
                     Ok(Event::Empty(t)) => match t.name().as_ref() {
                         b"background" => {
-                            let bg = Background::new(t , &directory);
+                            let bg = Background::new(t, &directory);
                             backgrounds.push(bg);
                         }
                         b"button" => {
@@ -83,7 +83,6 @@ pub mod skin {
     struct Background {
         name: String,
         image: PathBuf,
-
     }
 
     impl Background {
@@ -92,7 +91,7 @@ pub mod skin {
 
             Self {
                 name: attributes["name"].to_owned(),
-                image: Path::new(&dir).join(&attributes["image"])
+                image: Path::new(&dir).join(&attributes["image"]),
             }
         }
     }
@@ -112,7 +111,7 @@ pub mod skin {
         fn new(t: BytesStart, dir: &PathBuf) -> Self {
             let attributes = parse_attributes(t);
             let image = Path::new(&dir).join(&attributes["image"]);
-            let image_info =  ImageInfo::from_file_path(&image).unwrap();
+            let image_info = ImageInfo::from_file_path(&image).unwrap();
             let x = attributes["x"].parse::<i32>().unwrap();
             let y = attributes["y"].parse::<i32>().unwrap();
             let width = image_info.size.width as u32;
@@ -122,7 +121,7 @@ pub mod skin {
                 image,
                 x,
                 y,
-                width, 
+                width,
                 height,
                 rect: Rect::new(x, y, width, height),
             }
