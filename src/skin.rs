@@ -1,17 +1,18 @@
 pub mod skin {
-    use quick_xml::events::BytesStart;
-    use quick_xml::events::Event;
+    use quick_xml::events::{BytesStart, Event};
     use quick_xml::reader::Reader;
+    use sdl2::rect::Rect;
     use std::collections::HashMap;
     use std::fs;
     use std::io::Read;
     use std::path::Path;
     use std::path::PathBuf;
+    use imageinfo::ImageInfo;
 
     #[derive(Debug)]
     pub struct Skin {
         pub metadata: HashMap<String, String>,
-        pub backgrounds: HashMap<String, String>,
+        pub backgrounds: HashMap<String, PathBuf>,
         pub buttons: HashMap<String, Button>,
         pub directory: PathBuf,
     }
@@ -24,6 +25,7 @@ pub mod skin {
             let mut backgrounds: Vec<Background> = Vec::new();
             let mut buttons: Vec<Button> = Vec::new();
             let mut metadata: HashMap<String, String> = HashMap::new();
+            let directory = file_path.parent().unwrap().to_owned();
 
             loop {
                 // dbg!(&reader.read_event());
@@ -31,11 +33,11 @@ pub mod skin {
                     Ok(Event::Start(t)) => metadata = parse_attributes(t),
                     Ok(Event::Empty(t)) => match t.name().as_ref() {
                         b"background" => {
-                            let bg = Background::new(t);
+                            let bg = Background::new(t , &directory);
                             backgrounds.push(bg);
                         }
                         b"button" => {
-                            let bt = Button::new(t);
+                            let bt = Button::new(t, &directory);
                             buttons.push(bt);
                         }
                         _ => {}
@@ -49,7 +51,7 @@ pub mod skin {
                 metadata: metadata,
                 backgrounds: Skin::parse_backgrounds(backgrounds),
                 buttons: Skin::parse_buttons(buttons),
-                directory: file_path.parent().unwrap().to_owned(),
+                directory,
             }
         }
 
@@ -60,7 +62,7 @@ pub mod skin {
             text
         }
 
-        fn parse_backgrounds(backgrounds_vec: Vec<Background>) -> HashMap<String, String> {
+        fn parse_backgrounds(backgrounds_vec: Vec<Background>) -> HashMap<String, PathBuf> {
             let mut backgrounds = HashMap::new();
             for background in backgrounds_vec {
                 backgrounds.insert(background.name.to_lowercase(), background.image);
@@ -80,15 +82,17 @@ pub mod skin {
     #[derive(Debug)]
     struct Background {
         name: String,
-        image: String,
+        image: PathBuf,
+
     }
 
     impl Background {
-        fn new(t: BytesStart) -> Self {
+        fn new(t: BytesStart, dir: &PathBuf) -> Self {
             let attributes = parse_attributes(t);
+
             Self {
                 name: attributes["name"].to_owned(),
-                image: attributes["image"].to_owned(),
+                image: Path::new(&dir).join(attributes["image"].to_owned())
             }
         }
     }
@@ -96,19 +100,31 @@ pub mod skin {
     #[derive(Debug)]
     pub struct Button {
         pub name: String,
-        pub image: String,
-        pub x: u32,
-        pub y: u32,
+        pub image: PathBuf,
+        pub x: i32,
+        pub y: i32,
+        pub width: u32,
+        pub height: u32,
+        pub rect: Rect,
     }
 
     impl Button {
-        fn new(t: BytesStart) -> Self {
+        fn new(t: BytesStart, dir: &PathBuf) -> Self {
             let attributes = parse_attributes(t);
+            let image = Path::new(&dir).join(attributes["image"].to_owned());
+            let image_info =  ImageInfo::from_file_path(&image).unwrap();
+            let x = attributes["x"].parse::<i32>().unwrap();
+            let y = attributes["y"].parse::<i32>().unwrap();
+            let width = image_info.size.width as u32;
+            let height = image_info.size.height as u32;
             Self {
                 name: attributes["name"].to_owned(),
-                image: attributes["image"].to_owned(),
-                x: attributes["x"].parse::<u32>().unwrap(),
-                y: attributes["y"].parse::<u32>().unwrap(),
+                image,
+                x,
+                y,
+                width, 
+                height,
+                rect: Rect::new(x, y, width, height),
             }
         }
     }
