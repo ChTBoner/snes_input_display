@@ -17,7 +17,6 @@ fn main() -> Result<(), String> {
     let controller_config_path = Path::new("./confs/SuperMetroid.json");
     // let controller_config_path = Path::new("./confs/ALTTP.json");
     let controller = Controller::new(controller_config_path);
-    dbg!(&controller);
 
     /* Setup Skin data */
     // let selected_skin = "default".to_string();
@@ -27,7 +26,6 @@ fn main() -> Result<(), String> {
         Path::new("E:/Emu/ButtonMash/Skins/snes-super-famicom-squabbler/skin.xml");
     // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-sm/skin.xml");
     let skin = Skin::new(skin_config_path);
-    dbg!(&skin);
 
     /* Connect to USB2SNES Server */
     let mut usb2snes = SyncClient::connect();
@@ -68,55 +66,28 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
 
-    let selected_skin_path = &skin.backgrounds[&selected_skin];
-    dbg!(selected_skin_path);
-
-    let controller_texture = texture_creator.load_texture(selected_skin_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["a"].image);
-    let button_texture_a = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["b"].image);
-    let button_texture_b = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["x"].image);
-    let button_texture_x = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["y"].image);
-    let button_texture_y = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["select"].image);
-    let button_texture_select = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["start"].image);
-    let button_texture_start = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["r"].image);
-    let button_texture_r = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["l"].image);
-    let button_texture_l = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["up"].image);
-    let button_texture_up = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["down"].image);
-    let button_texture_down = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["left"].image);
-    let button_texture_left = texture_creator.load_texture(&button_path)?;
-
-    let button_path = Path::new(&skin.directory).join(&skin.buttons["right"].image);
-    let button_texture_right = texture_creator.load_texture(&button_path)?;
+    let background_texture = texture_creator.load_texture(&skin.backgrounds[&selected_skin])?;
+    let button_texture_a = texture_creator.load_texture(&skin.buttons["a"].image)?;
+    let button_texture_b = texture_creator.load_texture(&skin.buttons["b"].image)?;
+    let button_texture_x = texture_creator.load_texture(&skin.buttons["x"].image)?;
+    let button_texture_y = texture_creator.load_texture(&skin.buttons["y"].image)?;
+    let button_texture_select = texture_creator.load_texture(&skin.buttons["select"].image)?;
+    let button_texture_start = texture_creator.load_texture(&skin.buttons["start"].image)?;
+    let button_texture_r = texture_creator.load_texture(&skin.buttons["r"].image)?;
+    let button_texture_l = texture_creator.load_texture(&skin.buttons["l"].image)?;
+    let button_texture_up = texture_creator.load_texture(&skin.buttons["up"].image)?;
+    let button_texture_down = texture_creator.load_texture(&skin.buttons["down"].image)?;
+    let button_texture_left = texture_creator.load_texture(&skin.buttons["left"].image)?;
+    let button_texture_right = texture_creator.load_texture(&skin.buttons["right"].image)?;
 
     'mainloop: loop {
         let events = controller.pushed(&mut usb2snes);
 
-        canvas.copy(&controller_texture, None, None)?;
+        canvas.copy(&background_texture, None, None)?;
         for event in events {
             match event {
                 ControllerEvents::A => {
-                    canvas.copy(&button_texture_a, None, skin.buttons["a"].rect)?;
+                    canvas.copy(&button_texture_a, None, skin.buttons["a"].rect)?
                 }
                 ControllerEvents::X => {
                     canvas.copy(&button_texture_x, None, skin.buttons["x"].rect)?;
