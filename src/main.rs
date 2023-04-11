@@ -1,7 +1,7 @@
-mod controller;
+mod controllers;
 mod qusb2snes;
-mod skin;
-use controller::controller::{Controller, ControllerEvents};
+mod skins;
+use controllers::controller::{Controller, ControllerEvents};
 use qusb2snes::usb2snes::SyncClient;
 use std::path::Path;
 use imageinfo::ImageInfo;
@@ -9,7 +9,7 @@ use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
 
-use crate::skin::skin::Skin;
+use skins::skin::Skin;
 
 fn main() -> Result<(), String> {
     
@@ -17,7 +17,7 @@ fn main() -> Result<(), String> {
     
     let controller_config_path = Path::new("./confs/SuperMetroid.json");
     // let controller_config_path = Path::new("./confs/ALTTP.json");
-    let controller = Controller::new(&controller_config_path);
+    let controller = Controller::new(controller_config_path);
     dbg!(&controller);
     
     /* Setup Skin data */
@@ -67,7 +67,7 @@ fn main() -> Result<(), String> {
     let selected_skin_path = &skin.backgrounds[&selected_skin];
     dbg!(selected_skin_path);
 
-    let controller_texture = texture_creator.load_texture(&selected_skin_path)?;
+    let controller_texture = texture_creator.load_texture(selected_skin_path)?;
 
     let button_path = Path::new(&skin.directory).join(&skin.buttons["a"].image);
     let button_texture_a = texture_creator.load_texture(&button_path)?;

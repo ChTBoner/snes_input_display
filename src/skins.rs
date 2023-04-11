@@ -48,7 +48,7 @@ pub mod skin {
                 }
             }
             Self {
-                metadata: metadata,
+                metadata,
                 backgrounds: Skin::parse_backgrounds(backgrounds),
                 buttons: Skin::parse_buttons(buttons),
                 directory,
@@ -92,7 +92,7 @@ pub mod skin {
 
             Self {
                 name: attributes["name"].to_owned(),
-                image: Path::new(&dir).join(attributes["image"].to_owned())
+                image: Path::new(&dir).join(&attributes["image"])
             }
         }
     }
@@ -111,7 +111,7 @@ pub mod skin {
     impl Button {
         fn new(t: BytesStart, dir: &PathBuf) -> Self {
             let attributes = parse_attributes(t);
-            let image = Path::new(&dir).join(attributes["image"].to_owned());
+            let image = Path::new(&dir).join(&attributes["image"]);
             let image_info =  ImageInfo::from_file_path(&image).unwrap();
             let x = attributes["x"].parse::<i32>().unwrap();
             let y = attributes["y"].parse::<i32>().unwrap();
