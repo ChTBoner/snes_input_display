@@ -6,7 +6,7 @@ pub mod controller {
 
     use crate::qusb2snes::usb2snes::SyncClient;
 
-    pub enum ControllerEvents {
+    pub enum Inputs {
         A,
         B,
         X,
@@ -50,46 +50,46 @@ pub mod controller {
             serde_json::from_str(&config_data).expect("Unable to parse")
         }
 
-        pub fn pushed(&self, client: &mut SyncClient) -> Vec<ControllerEvents> {
+        pub fn pushed(&self, client: &mut SyncClient) -> Vec<Inputs> {
             let inputs = client.get_address(self.address, self.size);
             let bits = inputs.view_bits::<Msb0>();
             let mut controller_events = Vec::new();
 
             if bits[self.button_layout.a] {
-                controller_events.push(ControllerEvents::A);
+                controller_events.push(Inputs::A);
             };
             if bits[self.button_layout.x] {
-                controller_events.push(ControllerEvents::X);
+                controller_events.push(Inputs::X);
             };
             if bits[self.button_layout.b] {
-                controller_events.push(ControllerEvents::B);
+                controller_events.push(Inputs::B);
             };
             if bits[self.button_layout.y] {
-                controller_events.push(ControllerEvents::Y);
+                controller_events.push(Inputs::Y);
             };
             if bits[self.button_layout.select] {
-                controller_events.push(ControllerEvents::Select);
+                controller_events.push(Inputs::Select);
             };
             if bits[self.button_layout.start] {
-                controller_events.push(ControllerEvents::Start);
+                controller_events.push(Inputs::Start);
             };
             if bits[self.button_layout.up] {
-                controller_events.push(ControllerEvents::Up);
+                controller_events.push(Inputs::Up);
             };
             if bits[self.button_layout.down] {
-                controller_events.push(ControllerEvents::Down);
+                controller_events.push(Inputs::Down);
             };
             if bits[self.button_layout.left] {
-                controller_events.push(ControllerEvents::Left);
+                controller_events.push(Inputs::Left);
             };
             if bits[self.button_layout.right] {
-                controller_events.push(ControllerEvents::Right);
+                controller_events.push(Inputs::Right);
             };
             if bits[self.button_layout.l] {
-                controller_events.push(ControllerEvents::L);
+                controller_events.push(Inputs::L);
             };
             if bits[self.button_layout.r] {
-                controller_events.push(ControllerEvents::R);
+                controller_events.push(Inputs::R);
             };
             controller_events
         }

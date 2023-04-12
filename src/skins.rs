@@ -14,14 +14,18 @@ pub mod skin {
     #[derive(Debug)]
     pub struct Skin {
         pub metadata: HashMap<String, String>,
-        pub backgrounds: HashMap<String, PathBuf>,
+        pub backgrounds: HashMap<String, Background>,
         pub buttons: HashMap<String, Button>,
         pub directory: PathBuf,
     }
 
     impl Skin {
-        pub fn new(file_path: &Path) -> Skin {
-            let file = Skin::load_file(file_path);
+        pub fn new(skins_path: &Path, skin: String) -> Skin {
+            let skin_filename = "skin.xml";
+    // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-skinny/skin.xml");
+            let file_path = skins_path.join(&skin).join(skin_filename);
+            dbg!(&file_path);
+            let file = Skin::load_file(&file_path);
 
             let mut reader = Reader::from_str(&file);
             let mut backgrounds: Vec<Background> = Vec::new();
@@ -64,10 +68,10 @@ pub mod skin {
             text
         }
 
-        fn parse_backgrounds(backgrounds_vec: Vec<Background>) -> HashMap<String, PathBuf> {
+        fn parse_backgrounds(backgrounds_vec: Vec<Background>) -> HashMap<String, Background> {
             let mut backgrounds = HashMap::new();
             for background in backgrounds_vec {
-                backgrounds.insert(background.name.to_lowercase(), background.image);
+                backgrounds.insert(background.name.to_lowercase(), background);
             }
             backgrounds
         }
@@ -82,18 +86,23 @@ pub mod skin {
     }
 
     #[derive(Debug)]
-    struct Background {
-        name: String,
-        image: PathBuf,
+    pub struct Background {
+        pub name: String,
+        pub image: PathBuf,
+        pub width: u32,
+        pub height: u32,
     }
 
     impl Background {
         fn new(t: BytesStart, dir: &PathBuf) -> Self {
             let attributes = parse_attributes(t);
-
+            let image = Path::new(&dir).join(&attributes["image"]);
+            let image_info = ImageInfo::from_file_path(&image).unwrap();
             Self {
                 name: attributes["name"].to_owned(),
-                image: Path::new(&dir).join(&attributes["image"]),
+                image,
+                width: image_info.size.width as u32,
+                height: image_info.size.height as u32,
             }
         }
     }

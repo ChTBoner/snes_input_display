@@ -1,7 +1,7 @@
 mod controllers;
 mod qusb2snes;
 mod skins;
-use controllers::controller::{Controller, ControllerEvents};
+use controllers::controller::{Controller, Inputs};
 use imageinfo::ImageInfo;
 use qusb2snes::usb2snes::SyncClient;
 use sdl2::event::Event;
@@ -20,12 +20,12 @@ fn main() -> Result<(), String> {
 
     /* Setup Skin data */
     // let selected_skin = "default".to_string();
-    let selected_skin = "black".to_string();
-    // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-skinny/skin.xml");
-    let skin_config_path =
-        Path::new("E:/Emu/ButtonMash/Skins/snes-super-famicom-squabbler/skin.xml");
+    let skins_path = Path::new("/home/thibault/Documents/perso/squabbler-retrospy-nintendospy-skins/skins");
+    let selected_skin = "snes-super-famicom-squabbler".to_string();
+    let selected_skin_theme = "black".to_string();
+    
     // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-sm/skin.xml");
-    let skin = Skin::new(skin_config_path);
+    let skin = Skin::new(skins_path, selected_skin);
 
     /* Connect to USB2SNES Server */
     let mut usb2snes = SyncClient::connect();
@@ -43,16 +43,14 @@ fn main() -> Result<(), String> {
     Set SDL2 context
     */
     // get background image size
-    let background_info = ImageInfo::from_file_path(&skin.backgrounds[&selected_skin]).unwrap();
-
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
     let window = video_subsystem
         .window(
             "rust-sdl2 demo: Video",
-            background_info.size.width as u32,
-            background_info.size.height as u32,
+            skin.backgrounds[&selected_skin_theme].width,
+            skin.backgrounds[&selected_skin_theme].height,
         )
         .position_centered()
         .build()
@@ -66,7 +64,7 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
 
-    let background_texture = texture_creator.load_texture(&skin.backgrounds[&selected_skin])?;
+    let background_texture = texture_creator.load_texture(&skin.backgrounds[&selected_skin_theme].image)?;
     let button_texture_a = texture_creator.load_texture(&skin.buttons["a"].image)?;
     let button_texture_b = texture_creator.load_texture(&skin.buttons["b"].image)?;
     let button_texture_x = texture_creator.load_texture(&skin.buttons["x"].image)?;
@@ -86,40 +84,40 @@ fn main() -> Result<(), String> {
         canvas.copy(&background_texture, None, None)?;
         for event in events {
             match event {
-                ControllerEvents::A => {
+                Inputs::A => {
                     canvas.copy(&button_texture_a, None, skin.buttons["a"].rect)?
                 }
-                ControllerEvents::X => {
+                Inputs::X => {
                     canvas.copy(&button_texture_x, None, skin.buttons["x"].rect)?;
                 }
-                ControllerEvents::B => {
+                Inputs::B => {
                     canvas.copy(&button_texture_b, None, skin.buttons["b"].rect)?;
                 }
-                ControllerEvents::Y => {
+                Inputs::Y => {
                     canvas.copy(&button_texture_y, None, skin.buttons["y"].rect)?;
                 }
-                ControllerEvents::Select => {
+                Inputs::Select => {
                     canvas.copy(&button_texture_select, None, skin.buttons["select"].rect)?;
                 }
-                ControllerEvents::Start => {
+                Inputs::Start => {
                     canvas.copy(&button_texture_start, None, skin.buttons["start"].rect)?;
                 }
-                ControllerEvents::Up => {
+                Inputs::Up => {
                     canvas.copy(&button_texture_up, None, skin.buttons["up"].rect)?;
                 }
-                ControllerEvents::Down => {
+                Inputs::Down => {
                     canvas.copy(&button_texture_down, None, skin.buttons["down"].rect)?;
                 }
-                ControllerEvents::Left => {
+                Inputs::Left => {
                     canvas.copy(&button_texture_left, None, skin.buttons["left"].rect)?;
                 }
-                ControllerEvents::Right => {
+                Inputs::Right => {
                     canvas.copy(&button_texture_right, None, skin.buttons["right"].rect)?;
                 }
-                ControllerEvents::L => {
+                Inputs::L => {
                     canvas.copy(&button_texture_l, None, skin.buttons["l"].rect)?;
                 }
-                ControllerEvents::R => {
+                Inputs::R => {
                     canvas.copy(&button_texture_r, None, skin.buttons["r"].rect)?;
                 }
             }
