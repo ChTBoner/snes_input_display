@@ -1,12 +1,13 @@
 mod controllers;
 mod qusb2snes;
 mod skins;
-use controllers::controller::{Controller, Inputs};
+use controllers::controller::{Controller};
 use imageinfo::ImageInfo;
 use qusb2snes::usb2snes::SyncClient;
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
+use std::collections::HashMap;
 use std::path::Path;
 
 use skins::skin::Skin;
@@ -63,64 +64,30 @@ fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let texture_creator = canvas.texture_creator();
-
+    // skin.load_textures(&canvas);
     let background_texture = texture_creator.load_texture(&skin.backgrounds[&selected_skin_theme].image)?;
-    let button_texture_a = texture_creator.load_texture(&skin.buttons["a"].image)?;
-    let button_texture_b = texture_creator.load_texture(&skin.buttons["b"].image)?;
-    let button_texture_x = texture_creator.load_texture(&skin.buttons["x"].image)?;
-    let button_texture_y = texture_creator.load_texture(&skin.buttons["y"].image)?;
-    let button_texture_select = texture_creator.load_texture(&skin.buttons["select"].image)?;
-    let button_texture_start = texture_creator.load_texture(&skin.buttons["start"].image)?;
-    let button_texture_r = texture_creator.load_texture(&skin.buttons["r"].image)?;
-    let button_texture_l = texture_creator.load_texture(&skin.buttons["l"].image)?;
-    let button_texture_up = texture_creator.load_texture(&skin.buttons["up"].image)?;
-    let button_texture_down = texture_creator.load_texture(&skin.buttons["down"].image)?;
-    let button_texture_left = texture_creator.load_texture(&skin.buttons["left"].image)?;
-    let button_texture_right = texture_creator.load_texture(&skin.buttons["right"].image)?;
-
+    
+    let mut button_textures = HashMap::new();
+    
+    button_textures.insert("a", texture_creator.load_texture(&skin.buttons["a"].image)?);
+    button_textures.insert("b", texture_creator.load_texture(&skin.buttons["b"].image)?);
+    button_textures.insert("x", texture_creator.load_texture(&skin.buttons["x"].image)?);
+    button_textures.insert("y", texture_creator.load_texture(&skin.buttons["y"].image)?);
+    button_textures.insert("select", texture_creator.load_texture(&skin.buttons["select"].image)?);
+    button_textures.insert("start", texture_creator.load_texture(&skin.buttons["start"].image)?);
+    button_textures.insert("r", texture_creator.load_texture(&skin.buttons["r"].image)?);
+    button_textures.insert("l", texture_creator.load_texture(&skin.buttons["l"].image)?);
+    button_textures.insert("up", texture_creator.load_texture(&skin.buttons["up"].image)?);
+    button_textures.insert("down", texture_creator.load_texture(&skin.buttons["down"].image)?);
+    button_textures.insert("left", texture_creator.load_texture(&skin.buttons["left"].image)?);
+    button_textures.insert("right", texture_creator.load_texture(&skin.buttons["right"].image)?);
+ 
     'mainloop: loop {
         let events = controller.pushed(&mut usb2snes);
 
         canvas.copy(&background_texture, None, None)?;
         for event in events {
-            match event {
-                Inputs::A => {
-                    canvas.copy(&button_texture_a, None, skin.buttons["a"].rect)?
-                }
-                Inputs::X => {
-                    canvas.copy(&button_texture_x, None, skin.buttons["x"].rect)?;
-                }
-                Inputs::B => {
-                    canvas.copy(&button_texture_b, None, skin.buttons["b"].rect)?;
-                }
-                Inputs::Y => {
-                    canvas.copy(&button_texture_y, None, skin.buttons["y"].rect)?;
-                }
-                Inputs::Select => {
-                    canvas.copy(&button_texture_select, None, skin.buttons["select"].rect)?;
-                }
-                Inputs::Start => {
-                    canvas.copy(&button_texture_start, None, skin.buttons["start"].rect)?;
-                }
-                Inputs::Up => {
-                    canvas.copy(&button_texture_up, None, skin.buttons["up"].rect)?;
-                }
-                Inputs::Down => {
-                    canvas.copy(&button_texture_down, None, skin.buttons["down"].rect)?;
-                }
-                Inputs::Left => {
-                    canvas.copy(&button_texture_left, None, skin.buttons["left"].rect)?;
-                }
-                Inputs::Right => {
-                    canvas.copy(&button_texture_right, None, skin.buttons["right"].rect)?;
-                }
-                Inputs::L => {
-                    canvas.copy(&button_texture_l, None, skin.buttons["l"].rect)?;
-                }
-                Inputs::R => {
-                    canvas.copy(&button_texture_r, None, skin.buttons["r"].rect)?;
-                }
-            }
+            canvas.copy(&button_textures[event], None, skin.buttons[event].rect)?;
         }
         canvas.present();
 

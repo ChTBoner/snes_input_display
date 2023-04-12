@@ -2,16 +2,17 @@ pub mod skin {
     use imageinfo::ImageInfo;
     use quick_xml::events::{BytesStart, Event};
     use quick_xml::reader::Reader;
-    use sdl2::keyboard::TextInputUtil;
+    use sdl2::image::LoadTexture;
     use sdl2::rect::Rect;
-    use sdl2::render::Texture;
+    use sdl2::render::{Texture, Canvas};
+    use sdl2::video::{WindowContext, Window};
     use std::collections::HashMap;
     use std::fs;
     use std::io::Read;
     use std::path::Path;
     use std::path::PathBuf;
 
-    #[derive(Debug)]
+    // #[derive(Debug)]
     pub struct Skin {
         pub metadata: HashMap<String, String>,
         pub backgrounds: HashMap<String, Background>,
@@ -85,7 +86,7 @@ pub mod skin {
         }
     }
 
-    #[derive(Debug)]
+    // #[derive(Debug)]
     pub struct Background {
         pub name: String,
         pub image: PathBuf,
@@ -116,6 +117,7 @@ pub mod skin {
         pub width: u32,
         pub height: u32,
         pub rect: Rect,
+        // pub texture: Texture<'a>
     }
 
     impl Button {
@@ -135,6 +137,7 @@ pub mod skin {
                 width,
                 height,
                 rect: Rect::new(x, y, width, height),
+                // texture: T
             }
         }
     }
