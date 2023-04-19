@@ -23,8 +23,13 @@ pub mod usb2snes {
     // const INPUT_ADDRESS: u32 = 0xF5008B;
     use serde::{Deserialize, Serialize};
     use strum_macros::Display;
-    use websocket::sync::stream::TcpStream;
-    use websocket::{ClientBuilder, Message};
+    use tokio_tungstenite::{
+        connect_async,
+        tungstenite::{Error, Result},
+        WebSocketStream,
+        MaybeTlsStream
+    };
+    use net::net:TcpStream;
 
     #[derive(Display, Debug)]
     #[allow(dead_code)]
@@ -78,7 +83,7 @@ pub mod usb2snes {
     }
 
     pub struct SyncClient {
-        client: websocket::sync::Client<TcpStream>,
+        client: WebSocketStream<MaybeTlsStream<TcpStream>>,
         devel: bool,
     }
     impl SyncClient {
@@ -93,10 +98,7 @@ pub mod usb2snes {
         }
         pub fn connect_with_devel() -> SyncClient {
             SyncClient {
-                client: ClientBuilder::new("ws://localhost:23074")
-                    .unwrap()
-                    .connect_insecure()
-                    .unwrap(),
+                client: connect_async("ws://localhost:23074").await.expect("Failed to connect"),
                 devel: true,
             }
         }
