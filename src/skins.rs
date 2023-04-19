@@ -2,10 +2,7 @@ pub mod skin {
     use imageinfo::ImageInfo;
     use quick_xml::events::{BytesStart, Event};
     use quick_xml::reader::Reader;
-    use sdl2::image::LoadTexture;
     use sdl2::rect::Rect;
-    use sdl2::render::{Texture, Canvas};
-    use sdl2::video::{WindowContext, Window};
     use std::collections::HashMap;
     use std::fs;
     use std::io::Read;

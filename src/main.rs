@@ -2,7 +2,6 @@ mod controllers;
 mod qusb2snes;
 mod skins;
 use controllers::controller::{Controller};
-use imageinfo::ImageInfo;
 use qusb2snes::usb2snes::SyncClient;
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
@@ -49,7 +48,7 @@ fn main() -> Result<(), String> {
     let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
     let window = video_subsystem
         .window(
-            "rust-sdl2 demo: Video",
+            "SNES Input Display",
             skin.backgrounds[&selected_skin_theme].width,
             skin.backgrounds[&selected_skin_theme].height,
         )
