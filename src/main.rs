@@ -20,11 +20,11 @@ fn main() -> Result<(), String> {
 
     /* Setup Skin data */
     // let selected_skin = "default".to_string();
-    let skins_path = Path::new("/home/thibault/Documents/perso/squabbler-retrospy-nintendospy-skins/skins");
+    let skins_path = Path::new("E:/Emu/ButtonMash/Skins");
+    // let skins_path = Path::new("/home/thibault/Documents/perso/squabbler-retrospy-nintendospy-skins/skins");
     let selected_skin = "snes-super-famicom-squabbler".to_string();
     let selected_skin_theme = "black".to_string();
     
-    // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-sm/skin.xml");
     let skin = Skin::new(skins_path, selected_skin);
 
     /* Connect to USB2SNES Server */
