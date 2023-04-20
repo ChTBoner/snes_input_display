@@ -3,9 +3,9 @@ pub mod usb2snes {
     use std::net::TcpStream;
 
     use serde::{Deserialize, Serialize};
-    use strum_macros::Display;
     use serde_json;
-    use tungstenite::{connect, stream::MaybeTlsStream, Message, WebSocket, handshake::server::Response};
+    use strum_macros::Display;
+    use tungstenite::{connect, stream::MaybeTlsStream, Message, WebSocket};
 
     #[derive(Display, Debug)]
     pub enum Command {
@@ -58,24 +58,22 @@ pub mod usb2snes {
     }
 
     pub struct SyncClient {
-        client: WebSocket<MaybeTlsStream<TcpStream>>
+        client: WebSocket<MaybeTlsStream<TcpStream>>,
     }
 
     impl SyncClient {
         pub fn connect() -> Self {
-            let (client, response) = connect("ws://localhost:8080").expect("Failed to connect") ;
+            let (client, response) = connect("ws://localhost:8080").expect("Failed to connect");
             println!("Connected to the server");
             println!("Response HTTP code: {}", response.status());
             println!("Response contains the following headers:");
             for (ref header, _value) in response.headers() {
                 println!("* {}", header);
             }
-            Self {
-                client
-            }
+            Self { client }
         }
 
-        pub fn get_reply(&mut self) -> USB2SnesResult {
+        fn get_reply(&mut self) -> USB2SnesResult {
             let reply = self.client.read_message().expect("Error reading message");
             dbg!(&reply);
             let mut textreply: String = String::from("");
@@ -90,23 +88,27 @@ pub mod usb2snes {
             println!("Received: {}", textreply);
             serde_json::from_str(&textreply).unwrap()
         }
-    
-        pub fn send_message(&mut self, opcode: Command, space: Option<Space>, Operands: Vec<String>) {
 
+        pub fn send_message(
+            &mut self,
+            opcode: Command,
+            space: Option<Space>,
+            operands: Vec<String>,
+        ) {
             let nspace = space.map(|sp| sp.to_string());
 
             let query = USB2SnesQuery {
                 Opcode: opcode.to_string(),
                 Space: nspace,
                 Flags: vec![],
-                Operands,
+                Operands: operands,
             };
 
             let json = serde_json::to_string(&query).unwrap();
             let message = Message::text(json);
             self.client.write_message(message).unwrap();
         }
-    
+
         pub fn list_device(&mut self) -> Vec<String> {
             self.send_message(Command::DeviceList, Some(Space::SNES), vec![]);
             let reply = self.get_reply();
@@ -114,16 +116,11 @@ pub mod usb2snes {
         }
 
         pub fn attach(&mut self, device: &String) {
-            
-            self.send_message(
-                Command::Attach,
-                Some(Space::SNES),
-                vec![device.to_string()]
-            );
+            self.send_message(Command::Attach, Some(Space::SNES), vec![device.to_string()]);
         }
 
         pub fn set_name(&mut self, name: String) {
-            self.send_message(Command::Name,Some(Space::SNES), vec![name]);
+            self.send_message(Command::Name, Some(Space::SNES), vec![name]);
         }
 
         pub fn app_version(&mut self) -> String {
@@ -133,7 +130,7 @@ pub mod usb2snes {
         }
 
         pub fn info(&mut self) -> Infos {
-            self.send_message(Command::Info,Some(Space::SNES), vec![]);
+            self.send_message(Command::Info, Some(Space::SNES), vec![]);
             let usbreply = self.get_reply();
             let info: Vec<String> = usbreply.Results;
             Infos {
@@ -169,5 +166,4 @@ pub mod usb2snes {
             data
         }
     }
-
 }
