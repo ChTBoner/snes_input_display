@@ -1,4 +1,0 @@
-websockets==10.4
-pygame==2.1.2
-bitstring==4.0.1
-py2snes==1.0.4
