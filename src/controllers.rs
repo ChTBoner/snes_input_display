@@ -6,7 +6,6 @@ pub mod controller {
 
     use crate::qusb2snes::usb2snes::SyncClient;
 
-
     #[derive(Deserialize, Debug)]
     pub struct ButtonLayout {
         pub b: usize,
@@ -22,7 +21,6 @@ pub mod controller {
         pub l: usize,
         pub r: usize,
     }
-
 
     #[derive(Deserialize, Debug)]
     pub struct Controller {

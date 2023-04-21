@@ -21,6 +21,3 @@ dirs = "5.0.0"
 version = "*"
 default-features = false
 features = ["image"]
-
-
-

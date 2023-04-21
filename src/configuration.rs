@@ -1,8 +1,8 @@
 pub mod config {
-    use config::Config;
-    use std::path::PathBuf;
-    use serde::Deserialize;
+    use config::{Config, ConfigError};
     use dirs;
+    use serde::Deserialize;
+    use std::path::PathBuf;
 
     #[derive(Deserialize, Debug)]
     pub struct ControllerConfig {
@@ -19,24 +19,23 @@ pub mod config {
     #[derive(Deserialize, Debug)]
     pub struct AppConfig {
         pub controller: ControllerConfig,
-        pub skin: SkinConfig
+        pub skin: SkinConfig,
     }
 
     impl AppConfig {
-        pub fn new() -> Self {
-            let config_file_path = dirs::config_local_dir().unwrap().join("snes-input-display").join("settings");
+        pub fn new() -> Result<Self, ConfigError> {
+            let config_file_path = dirs::config_local_dir()
+                .unwrap()
+                .join("snes-input-display")
+                .join("settings");
             let config_file_path = config_file_path.to_str().unwrap();
             let s = Config::builder()
-                .add_source(config::File::with_name(&config_file_path))
-
+                .add_source(config::File::with_name(config_file_path))
                 .build()
                 .unwrap();
-            
-            match s.try_deserialize() {
-                Ok(settings) => return settings,
-                Err(_) => panic!(),
-            }
+
+            let settings = s.try_deserialize()?;
+            Ok(settings)
         }
     }
-
 }
