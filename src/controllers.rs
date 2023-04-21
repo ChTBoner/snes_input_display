@@ -6,20 +6,6 @@ pub mod controller {
 
     use crate::qusb2snes::usb2snes::SyncClient;
 
-    // pub enum Inputs {
-    //     A,
-    //     B,
-    //     X,
-    //     Y,
-    //     Select,
-    //     Start,
-    //     Up,
-    //     Down,
-    //     Left,
-    //     Right,
-    //     L,
-    //     R,
-    // }
 
     #[derive(Deserialize, Debug)]
     pub struct ButtonLayout {
@@ -36,6 +22,7 @@ pub mod controller {
         pub l: usize,
         pub r: usize,
     }
+
 
     #[derive(Deserialize, Debug)]
     pub struct Controller {

@@ -20,9 +20,7 @@ pub mod skin {
     impl Skin {
         pub fn new(skins_path: &Path, skin: String) -> Skin {
             let skin_filename = "skin.xml";
-    // let skin_config_path = Path::new("E:/Emu/ButtonMash/Skins/snes-skinny/skin.xml");
             let file_path = skins_path.join(&skin).join(skin_filename);
-            dbg!(&file_path);
             let file = Skin::load_file(&file_path);
 
             let mut reader = Reader::from_str(&file);
@@ -32,7 +30,6 @@ pub mod skin {
             let directory = file_path.parent().unwrap().to_owned();
 
             loop {
-                // dbg!(&reader.read_event());
                 match reader.read_event() {
                     Ok(Event::Start(t)) => metadata = parse_attributes(t),
                     Ok(Event::Empty(t)) => match t.name().as_ref() {

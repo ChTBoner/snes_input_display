@@ -1,31 +1,26 @@
 mod controllers;
 mod qusb2snes;
 mod skins;
+mod configuration;
 use controllers::controller::{Controller};
 use qusb2snes::usb2snes::SyncClient;
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
 use std::collections::HashMap;
-use std::path::Path;
+
 
 use skins::skin::Skin;
 
+use configuration::config::AppConfig;
+
 fn main() -> Result<(), String> {
+    let app_config = AppConfig::new();
     /* Setup Controller data */
 
-    let controller_config_path = Path::new("./confs/SuperMetroid.json");
-    // let controller_config_path = Path::new("./confs/ALTTP.json");
-    let controller = Controller::new(controller_config_path);
-
-    /* Setup Skin data */
-    // let selected_skin = "default".to_string();
-    let skins_path = Path::new("E:/Emu/ButtonMash/Skins");
-    // let skins_path = Path::new("/home/thibault/Documents/perso/squabbler-retrospy-nintendospy-skins/skins");
-    let selected_skin = "snes-super-famicom-squabbler".to_string();
-    let selected_skin_theme = "black".to_string();
+    let controller = Controller::new(&app_config.controller.input_config_path);
     
-    let skin = Skin::new(skins_path, selected_skin);
+    let skin = Skin::new(&app_config.skin.skins_path, app_config.skin.skin_name);
 
     /* Connect to USB2SNES Server */
     let mut usb2snes = SyncClient::connect();
@@ -49,8 +44,8 @@ fn main() -> Result<(), String> {
     let window = video_subsystem
         .window(
             "SNES Input Display",
-            skin.backgrounds[&selected_skin_theme].width,
-            skin.backgrounds[&selected_skin_theme].height,
+            skin.backgrounds[&app_config.skin.skin_theme].width,
+            skin.backgrounds[&app_config.skin.skin_theme].height,
         )
         .position_centered()
         .build()
@@ -64,7 +59,7 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     // skin.load_textures(&canvas);
-    let background_texture = texture_creator.load_texture(&skin.backgrounds[&selected_skin_theme].image)?;
+    let background_texture = texture_creator.load_texture(&skin.backgrounds[&app_config.skin.skin_theme].image)?;
     
     let mut button_textures = HashMap::new();
     
