@@ -75,7 +75,6 @@ pub mod usb2snes {
 
         fn get_reply(&mut self) -> USB2SnesResult {
             let reply = self.client.read_message().expect("Error reading message");
-            dbg!(&reply);
             let mut textreply: String = String::from("");
             match reply {
                 Message::Text(value) => {
@@ -85,7 +84,6 @@ pub mod usb2snes {
                     println!("Error getting a reply");
                 }
             }
-            println!("Received: {}", textreply);
             serde_json::from_str(&textreply).unwrap()
         }
 
