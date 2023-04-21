@@ -898,6 +898,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusb2snes"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "770d579bcc12c9b48d7bca34b78721c68f6cc11c495ab2f76e912345de1d22f0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "strum_macros",
+ "tungstenite",
+]
+
+[[package]]
 name = "rust-ini"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1023,6 +1035,7 @@ dependencies = [
  "image",
  "imageinfo",
  "quick-xml",
+ "rusb2snes",
  "sdl2",
  "serde",
  "serde_json",

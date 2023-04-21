@@ -3,6 +3,7 @@ name = "snes_input_display"
 version = "0.1.0"
 edition = "2021"
 
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -16,6 +17,7 @@ image = "0.24.6"
 imageinfo = "0.7.7"
 config = "0.13.3"
 dirs = "5.0.0"
+rusb2snes = "0.1.0"
 
 [dependencies.sdl2]
 version = "*"

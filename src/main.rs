@@ -1,42 +1,42 @@
 mod configuration;
 mod controllers;
-mod qusb2snes;
+// mod qusb2snes;
 mod skins;
 use controllers::controller::Controller;
-use qusb2snes::usb2snes::SyncClient;
+// use qusb2snes::usb2snes::SyncClient;
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
 use std::collections::HashMap;
-
+use rusb2snes::SyncClient;
 use skins::skin::Skin;
 
 use configuration::config::AppConfig;
 
 fn main() -> Result<(), String> {
+    /* Setup Configs */
     let app_config = AppConfig::new().unwrap();
-    /* Setup Controller data */
-
+    
     let controller = Controller::new(&app_config.controller.input_config_path);
 
     let skin = Skin::new(&app_config.skin.skins_path, app_config.skin.skin_name);
 
     /* Connect to USB2SNES Server */
-    let mut usb2snes = SyncClient::connect();
-    println!("Connected to {}", usb2snes.app_version());
+    let mut usb2snes = SyncClient::connect().unwrap();
 
-    usb2snes.set_name(String::from("Snes Input Viewer"));
 
-    let devices = usb2snes.list_device();
+    usb2snes.set_name(String::from("Snes Input Viewer")).unwrap();
 
-    usb2snes.attach(&devices[0]);
-    let info = usb2snes.info();
+    let devices = usb2snes.list_device().unwrap();
+
+    usb2snes.attach(&devices[0]).unwrap();
+    let info = usb2snes.info().unwrap();
     println!("Attached to {} - {}", info.dev_type, info.version);
 
     /*
     Set SDL2 context
     */
-    // get background image size
+
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
@@ -95,7 +95,7 @@ fn main() -> Result<(), String> {
     );
 
     'mainloop: loop {
-        let events = controller.pushed(&mut usb2snes);
+        let events = controller.pushed(&mut usb2snes).unwrap();
 
         canvas.copy(&background_texture, None, None)?;
         for event in events {

@@ -3,8 +3,9 @@ pub mod controller {
     use serde::Deserialize;
     use serde_json;
     use std::{fs, path::Path};
+    use tungstenite::Error;
 
-    use crate::qusb2snes::usb2snes::SyncClient;
+    use rusb2snes::SyncClient;
 
     #[derive(Deserialize, Debug)]
     pub struct ButtonLayout {
@@ -35,8 +36,8 @@ pub mod controller {
             serde_json::from_str(&config_data).expect("Unable to parse")
         }
 
-        pub fn pushed(&self, client: &mut SyncClient) -> Vec<&str> {
-            let inputs = client.get_address(self.address, self.size);
+        pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<&str>, Error> {
+            let inputs = client.get_address(self.address, self.size)?;
             let bits = inputs.view_bits::<Msb0>();
             let mut inputs = Vec::new();
 
@@ -76,7 +77,7 @@ pub mod controller {
             if bits[self.button_layout.r] {
                 inputs.push("r");
             };
-            inputs
+            Ok(inputs)
         }
     }
 }
