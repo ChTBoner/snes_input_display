@@ -76,16 +76,6 @@ To build you will need the SDL2 and SDL2_images libs installed and the rustup to
 
 [INSTALL - SDL2 WIKI](https://wiki.libsdl.org/SDL2/Installation)
 
-On MacOs you can install with brew for example
-```sh
-brew install SDL2 SDL2_images
-```
-
-On Linux
-```sh
-# Ubuntu
-
-```
 
 ## TODO
 - Configuration via GUI
