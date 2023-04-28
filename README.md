@@ -11,8 +11,8 @@ image.png
 
 
 ## Requirements
-[QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
-Sd2Snes or FxPak Pro for original hardware
+- [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
+- Sd2Snes or FxPak Pro for original hardware
 
 ## Configuration
 Requires a configuration file named "settings.toml" at this location:
@@ -70,3 +70,22 @@ SNI or QUSB2SNES must be up and running and connected to a powered on console.
 [Skarsnik](https://github.com/Skarsnik)
 
 https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
+
+## Build instructions
+To build you will need the SDL2 and SDL2_images libs installed and the rustup toolchain.
+
+[INSTALL - SDL2 WIKI](https://wiki.libsdl.org/SDL2/Installation)
+
+On MacOs you can install with brew for example
+```sh
+brew install SDL2 SDL2_images
+```
+
+On Linux
+```sh
+# Ubuntu
+
+```
+
+## TODO
+- Configuration via GUI
