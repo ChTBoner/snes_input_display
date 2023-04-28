@@ -25,7 +25,8 @@ fn main() -> Result<(), String> {
     let mut usb2snes = SyncClient::connect().unwrap();
 
 
-    usb2snes.set_name(String::from("Snes Input Viewer")).unwrap();
+    usb2snes.set_name(String::from("S
+    $nes Input Viewer")).unwrap();
 
     let devices = usb2snes.list_device().unwrap();
 

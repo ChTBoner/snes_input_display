@@ -2,6 +2,13 @@
 Displays your SNES input reading directly from the console data
 Completely compatible with the [RetroSpy](https://retro-spy.com) format for Super Nintendo controllers.
 You can find great skins here: https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
+image.png
+
+
+
+![image info](images/snes_controller.png)
+
+
 
 ## Requirements
 [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
