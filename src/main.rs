@@ -1,9 +1,9 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod configuration;
 mod controllers;
-// mod qusb2snes;
 mod skins;
 use controllers::controller::Controller;
-// use qusb2snes::usb2snes::SyncClient;
+
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
