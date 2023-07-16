@@ -2,12 +2,13 @@ pub mod skin {
     use imageinfo::ImageInfo;
     use quick_xml::events::{BytesStart, Event};
     use quick_xml::reader::Reader;
-    use sdl2::rect::Rect;
+    // use sdl2::rect::Rect;
     use std::collections::HashMap;
     use std::fs;
     use std::io::Read;
     use std::path::Path;
     use std::path::PathBuf;
+
 
     // #[derive(Debug)]
     pub struct Skin {
@@ -84,8 +85,8 @@ pub mod skin {
     pub struct Background {
         pub name: String,
         pub image: PathBuf,
-        pub width: u32,
-        pub height: u32,
+        pub width: f32,
+        pub height: f32,
     }
 
     impl Background {
@@ -96,8 +97,8 @@ pub mod skin {
             Self {
                 name: attributes["name"].to_owned(),
                 image,
-                width: image_info.size.width as u32,
-                height: image_info.size.height as u32,
+                width: image_info.size.width as f32,
+                height: image_info.size.height as f32,
             }
         }
     }
@@ -110,7 +111,7 @@ pub mod skin {
         pub y: i32,
         pub width: u32,
         pub height: u32,
-        pub rect: Rect,
+        // pub rect: Rect,
         // pub texture: Texture<'a>
     }
 
@@ -130,7 +131,7 @@ pub mod skin {
                 y,
                 width,
                 height,
-                rect: Rect::new(x, y, width, height),
+                // rect: Rect::new(x, y, width, height),
                 // texture: T
             }
         }
