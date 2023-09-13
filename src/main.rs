@@ -8,30 +8,30 @@ use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
 use std::collections::HashMap;
+use std::error::Error;
 use rusb2snes::SyncClient;
 use skins::skin::Skin;
 
 use configuration::config::AppConfig;
 
-fn main() -> Result<(), String> {
+fn main() -> Result<(), Box<dyn Error>> {
     /* Setup Configs */
-    let app_config = AppConfig::new().unwrap();
+    let app_config = AppConfig::new()?;
     
     let controller = Controller::new(&app_config.controller.input_config_path);
 
     let skin = Skin::new(&app_config.skin.skins_path, app_config.skin.skin_name);
 
     /* Connect to USB2SNES Server */
-    let mut usb2snes = SyncClient::connect().unwrap();
+    let mut usb2snes = SyncClient::connect()?;
 
 
-    usb2snes.set_name(String::from("S
-    $nes Input Viewer")).unwrap();
+    usb2snes.set_name(String::from("Snes Input Viewer"))?;
 
-    let devices = usb2snes.list_device().unwrap();
+    let devices = usb2snes.list_device()?;
 
-    usb2snes.attach(&devices[0]).unwrap();
-    let info = usb2snes.info().unwrap();
+    usb2snes.attach(&devices[0])?;
+    let info = usb2snes.info()?;
     println!("Attached to {} - {}", info.dev_type, info.version);
 
     /*
@@ -96,7 +96,7 @@ fn main() -> Result<(), String> {
     );
 
     'mainloop: loop {
-        let events = controller.pushed(&mut usb2snes).unwrap();
+        let events = controller.pushed(&mut usb2snes)?;
 
         canvas.copy(&background_texture, None, None)?;
         for event in events {

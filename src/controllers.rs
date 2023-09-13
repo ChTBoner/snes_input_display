@@ -3,7 +3,7 @@ pub mod controller {
     use serde::Deserialize;
     use serde_json;
     use std::{fs, path::Path};
-    use tungstenite::Error;
+    use tungstenite::error::Error;
 
     use rusb2snes::SyncClient;
 

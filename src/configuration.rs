@@ -34,8 +34,7 @@ pub mod config {
                 .build()
                 .unwrap();
 
-            let settings = s.try_deserialize()?;
-            Ok(settings)
+            s.try_deserialize()
         }
     }
 }
