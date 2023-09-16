@@ -16,7 +16,7 @@ image.png
 
 ## Configuration
 Requires a configuration file named "settings.toml" at this location:
-- Windows: %localappdata%/snes-input-display/
+- Windows: %localappdata%\snes-input-display\
 - MacOs: $HOME/Library/Application Support/snes-input-display
 - Linux: $HOME/.config/snes-input-display
 
@@ -28,7 +28,7 @@ input_config_path = './confs/SuperMetroid.json'
 
 [skin]
 # skins_path = '/home/example/Documents/squabbler-retrospy-nintendospy-skins/skins'
-skins_path = 'C:\Users\example\Documents/squabbler-retrospy-nintendospy-skins/skins'
+skins_path = 'C:\Users\example\Documents/squabbler-retrospy-nintendospy-skins\skins'
 skin_name = "snes-super-famicom-squabbler"
 skin_theme = "black"
 
