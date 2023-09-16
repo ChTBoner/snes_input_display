@@ -7,6 +7,7 @@ use controllers::controller::Controller;
 use sdl2::event::Event;
 use sdl2::image::{InitFlag, LoadTexture};
 use sdl2::keyboard::Keycode;
+use sdl2::rect::Rect;
 use std::collections::HashMap;
 use std::error::Error;
 use rusb2snes::SyncClient;
@@ -41,11 +42,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
     let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
+    
+    let window_height = match app_config.skin.piano_roll {
+        true => skin.backgrounds[&app_config.skin.skin_theme].height * 2,
+        false => skin.backgrounds[&app_config.skin.skin_theme].height,
+    };
+
     let window = video_subsystem
         .window(
             "SNES Input Display",
             skin.backgrounds[&app_config.skin.skin_theme].width,
-            skin.backgrounds[&app_config.skin.skin_theme].height,
+            window_height,
         )
         .position_centered()
         .build()
@@ -98,7 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     'mainloop: loop {
         let events = controller.pushed(&mut usb2snes)?;
 
-        canvas.copy(&background_texture, None, None)?;
+        canvas.copy(&background_texture, None, Rect::new(0, 0, skin.backgrounds[&app_config.skin.skin_theme].width, skin.backgrounds[&app_config.skin.skin_theme].height))?;
         for event in events {
             canvas.copy(&button_textures[event], None, skin.buttons[event].rect)?;
         }
