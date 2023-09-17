@@ -153,4 +153,18 @@ pub mod skin {
         }
         attributes_map
     }
+    
+    // pub struct RollPress {
+    //     pub x: i32,
+    //     y: i32,
+    //     pub height: u32,
+    //     pub width: u32,
+    
+    // }
+    
+    // impl RollPress {
+    //     pub fn new(x: i32, y: i32, width: u32) -> Self {
+    //         Self { x, y, height: 1, width }
+    //     }
+    // }   
 }
