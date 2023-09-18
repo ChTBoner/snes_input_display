@@ -22,9 +22,9 @@ rusb2snes = "0.1"
 [dependencies.sdl2]
 version = "0.35"
 default-features = false
+# features = ["image", "gfx"]
 # features = ["image"]
 features = ["image", "gfx", "use-vcpkg"]
-
 
 [package.metadata.vcpkg]
 dependencies = ["sdl2", "sdl2-image", "sdl2-gfx"]
