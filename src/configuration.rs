@@ -3,7 +3,7 @@ pub mod config {
     use dirs;
     use serde::Deserialize;
     use std::path::PathBuf;
-
+    
     #[derive(Deserialize, Debug)]
     pub struct ControllerConfig {
         pub input_config_path: PathBuf,
@@ -32,8 +32,7 @@ pub mod config {
             let config_file_path = config_file_path.to_str().unwrap();
             let s = Config::builder()
                 .add_source(config::File::with_name(config_file_path))
-                .build()
-                .unwrap();
+                .build()?;
 
             s.try_deserialize()
         }
