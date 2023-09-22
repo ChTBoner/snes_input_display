@@ -1,0 +1,18 @@
+{
+    "address": 16059810,
+    "size": 5,
+    "button_layout": {
+        "b": 0,
+        "y": 1,
+        "select": 2,
+        "start": 3,
+        "up": 4,
+        "down": 5,
+        "left": 6,
+        "right": 7,
+        "a": 16,
+        "x": 17,
+        "l": 18,
+        "r": 19
+    }
+}
