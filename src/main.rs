@@ -3,15 +3,16 @@ mod configuration;
 mod controllers;
 mod skins;
 // mod viewer;
-use controllers::controller::{Controller, Buttons};
+use controllers::controller::{Buttons, Controller};
 
 use ggez::{
     conf, event,
-    graphics::{self, Color, GraphicsContext},
+    graphics,
     Context, ContextBuilder, GameResult,
 };
+use quick_xml::se;
 use rusb2snes::SyncClient;
-use skins::skin::Skin;
+use skins::skin::{Skin, PianoRoll, PianoRollRect};
 // use std::collections::HashMap;
 use std::error::Error;
 // use viewer::InputViewer;
@@ -25,15 +26,14 @@ struct InputViewer {
     controller: Controller,
     skin: Skin,
     client: SyncClient,
-    events: Vec<Buttons>
-
+    events: Vec<Buttons>,
 }
 
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller.input_config_path);
 
-        let skin = Skin::new(&config.skin.skins_path, &config.skin.skin_name, ctx)?;
+        let skin = Skin::new(&config.skin.skins_path, &config.skin.skin_name, &config.skin.skin_theme, ctx)?;
 
         /* Connect to USB2SNES Server */
         let mut client = SyncClient::connect()?;
@@ -47,13 +47,13 @@ impl InputViewer {
         println!("Attached to {} - {}", info.dev_type, info.version);
 
         let window_height = match config.skin.piano_roll {
-            true => skin.backgrounds[&config.skin.skin_theme].height * 2.0,
-            false => skin.backgrounds[&config.skin.skin_theme].height,
+            true => skin.background.height * 2.0,
+            false => skin.background.height,
         };
 
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {
-            width: skin.backgrounds[&config.skin.skin_theme].image.width() as f32,
+            width: skin.background.image.width() as f32,
             height: window_height,
             resizable: true,
             ..Default::default()
@@ -65,36 +65,49 @@ impl InputViewer {
             skin,
             client,
             events: Vec::new(),
-
         })
     }
+
+    // fn piano_roll(self) {
+    //     se
+    // }
 }
 
 impl event::EventHandler for InputViewer {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
         // Update code here...
-        const DESIRED_FPS: u32 = 60;
+        // const DESIRED_FPS: u32 = 60;
         self.events = self.controller.pushed(&mut self.client).unwrap();
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
+        
         // Draw background
-
-        canvas.draw(&self.skin.backgrounds[&self.config.skin.skin_theme].image, graphics::DrawParam::new());
+        canvas.draw(
+            &self.skin.background.image,
+            graphics::DrawParam::new(),
+        );
 
         // Draw inputs
         for event in self.events.iter() {
-            // let _x = self.skin.buttons[event].image;
-            dbg!(&event);
-            dbg!(&self.skin.buttons[&event].rect.point());
-
-            canvas.draw(&self.skin.buttons[&event].image, graphics::DrawParam::default().dest(self.skin.buttons[&event].rect.point()))
+            canvas.draw(
+                &self.skin.buttons[&event].image,
+                graphics::DrawParam::default().dest(self.skin.buttons[&event].rect.point()),
+            )
         }
+        
+        if self.config.skin.piano_roll {
+            self.skin.piano_roll.update(ctx.gfx.size(), &self.events);
+        }
+
         canvas.finish(ctx)
     }
+
+    
 }
+
 fn main() -> Result<GameResult, Box<dyn Error>> {
     /* Setup Configs */
     let app_config = AppConfig::new()?;

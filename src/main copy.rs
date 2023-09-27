@@ -112,52 +112,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let piano_roll_left_padding = piano_roll_extra_width / 2;
     // let piano_roll_right_padding = piano_roll_extra_width % 2;
     // let piano_roll_color:
-    let mut piano_roll_x_positions = HashMap::new();
-    piano_roll_x_positions.insert("left", piano_roll_left_padding + 5);
-    piano_roll_x_positions.insert(
-        "up",
-        piano_roll_x_positions.get("left").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "down",
-        piano_roll_x_positions.get("up").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "right",
-        piano_roll_x_positions.get("down").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "l",
-        piano_roll_x_positions.get("right").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "select",
-        piano_roll_x_positions.get("l").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "start",
-        piano_roll_x_positions.get("select").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "r",
-        piano_roll_x_positions.get("start").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "y",
-        piano_roll_x_positions.get("r").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "b",
-        piano_roll_x_positions.get("y").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "x",
-        piano_roll_x_positions.get("b").unwrap().to_owned() + piano_roll_section_width,
-    );
-    piano_roll_x_positions.insert(
-        "a",
-        piano_roll_x_positions.get("x").unwrap().to_owned() + piano_roll_section_width,
-    );
+    
 
     let mut piano_roll_vecs: HashMap<&str, Vec<Rect>> = HashMap::new();
     piano_roll_vecs.insert("left", Vec::new());
