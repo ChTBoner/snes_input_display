@@ -88,9 +88,9 @@ impl event::EventHandler for InputViewer {
         for event in self.events.iter() {
             // let _x = self.skin.buttons[event].image;
             dbg!(&event);
-            dbg!(&self.skin.buttons[&event].rect.x);
+            dbg!(&self.skin.buttons[&event].rect.point());
 
-            canvas.draw(&self.skin.buttons[&event].image, graphics::DrawParam::default().dest_rect(self.skin.buttons[&event].rect))
+            canvas.draw(&self.skin.buttons[&event].image, graphics::DrawParam::default().dest(self.skin.buttons[&event].rect.point()))
         }
         canvas.finish(ctx)
     }
