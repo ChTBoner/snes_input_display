@@ -1,6 +1,6 @@
 pub mod skin {
     use ggez::{
-        graphics::{Image, Rect},
+        graphics::{Image, Rect, Canvas},
         Context,
     };
     use quick_xml::events::{BytesStart, Event};
@@ -208,7 +208,7 @@ pub mod skin {
         inside_padding: f32,
         left_padding: f32,
         // hashmap of all positions
-        x_positions: HashMap<Buttons, PianoRollRect>,
+        pub x_positions: HashMap<Buttons, PianoRollRect>,
     }
 
     impl PianoRoll {
@@ -290,12 +290,18 @@ pub mod skin {
             }
         }
 
-        pub fn display {}
+        // pub fn display(self, canvas: &Canvas) {
+        //     for (button, rollrects) in self.x_positions.iter() {
+        //         for rect in rollrects.positions {
+        //             canvas.draw(drawable, param)
+        //         }
+        //     }
+        // }
     }
 
     pub struct PianoRollRect {
         x: f32,
-        positions: Vec<Rect>,
+        pub positions: Vec<Rect>,
     }
 
     impl PianoRollRect {
@@ -324,8 +330,9 @@ pub mod skin {
             if !self.positions.is_empty() && self.positions[0].y > *window_height {
                 self.positions.remove(0);
             }
+            dbg!(&self.positions);
         }
 
-        pub fn Display {}
+        // pub fn Display {}
     }
 }

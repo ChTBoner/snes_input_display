@@ -7,7 +7,7 @@ use controllers::controller::{Buttons, Controller};
 
 use ggez::{
     conf, event,
-    graphics,
+    graphics::{self, DrawParam},
     Context, ContextBuilder, GameResult,
 };
 use quick_xml::se;
@@ -87,20 +87,29 @@ impl event::EventHandler for InputViewer {
         // Draw background
         canvas.draw(
             &self.skin.background.image,
-            graphics::DrawParam::new(),
+            DrawParam::new(),
         );
 
-        // Draw inputs
-        for event in self.events.iter() {
-            canvas.draw(
-                &self.skin.buttons[&event].image,
-                graphics::DrawParam::default().dest(self.skin.buttons[&event].rect.point()),
-            )
-        }
-        
         if self.config.skin.piano_roll {
             self.skin.piano_roll.update(ctx.gfx.size(), &self.events);
         }
+
+        // Draw inputs
+        for event in self.events.iter() {
+            let button_image = &self.skin.buttons[&event].image;
+            canvas.draw(
+                button_image,
+                DrawParam::default().dest(self.skin.buttons[&event].rect.point()),
+            );
+            if self.config.skin.piano_roll {
+                for (_, rollrects) in &self.skin.piano_roll.x_positions {
+                    for rect in rollrects.positions.iter() {
+                        canvas.draw(button_image, DrawParam::new().dest(rect.point()))
+                    }
+                }
+            }
+        }
+        
 
         canvas.finish(ctx)
     }
