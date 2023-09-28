@@ -1,19 +1,18 @@
 {
     "address": 16056465,
     "size": 2,
-    "button_layout": 
-        {
-            "a": 0,
-            "x": 1,
-            "b": 8,
-            "y": 9,
-            "select": 10,
-            "start": 11,
-            "up": 12,
-            "down": 13,
-            "left": 14,
-            "right": 15,
-            "l": 2,
-            "r": 3
-        }
+    "button_layout": {
+        "a": 7,
+        "x": 6,
+        "b": 15,
+        "y": 14,
+        "select": 13,
+        "start": 12,
+        "up": 11,
+        "down": 10,
+        "left": 9,
+        "right": 8,
+        "l": 5,
+        "r": 4
+    }
 }

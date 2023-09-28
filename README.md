@@ -76,7 +76,12 @@ SNI or QUSB2SNES must be up and running and connected to a powered on console.
 https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
 
 ## Game List Working with default.json
+You should try with Defaults.json
+If not working, you can try to figure it out with an Emulator like Bizhawk
 
+- Super Metroid
+- Super Castlevania IV
+- Castlevania Dracula X
 
 ## TODO
 - Configuration via GUI

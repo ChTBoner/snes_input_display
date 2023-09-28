@@ -2,17 +2,17 @@
     "address": 16059810,
     "size": 3,
     "button_layout": {
-        "b": 0,
-        "y": 1,
-        "select": 2,
-        "start": 3,
-        "up": 4,
-        "down": 5,
-        "left": 6,
-        "right": 7,
-        "a": 16,
-        "x": 17,
-        "l": 18,
-        "r": 19
+        "b": 7,
+        "y": 6,
+        "select": 5,
+        "start": 4,
+        "up": 3,
+        "down": 2,
+        "left": 1,
+        "right": 0,
+        "a": 23,
+        "x": 22,
+        "l": 21,
+        "r": 20
     }
 }

@@ -1,6 +1,6 @@
 [controller]
 # paths should be in between single quotes
-input_config_path = './confs/SuperMetroid.json'
+input_config_path = './confs/Defaults.json'
 
 [skin]
 # skins_path = '/home/example/Documents/squabbler-retrospy-nintendospy-skins/skins'
