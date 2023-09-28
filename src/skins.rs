@@ -19,7 +19,6 @@ pub mod skin {
         pub directory: PathBuf,
         pub name: String,
         pub theme: String,
-        pub piano_roll: PianoRoll,
     }
 
     impl Skin {
@@ -37,7 +36,6 @@ pub mod skin {
             let background = Self::parse_backgrounds(backgrounds, theme).unwrap();
             Ok(Self {
                 // metadata,
-                piano_roll: PianoRoll::new(&background),
                 background,
                 buttons: Skin::parse_buttons(buttons),
                 directory,
@@ -192,129 +190,4 @@ pub mod skin {
         attributes_map
     }
 
-    pub struct PianoRoll {
-        // width of section reserved for each button
-        // section_width: f32,
-        // extra space left after division: modulo of section_width calculation
-        // extra_width: f32,
-        rect_width: f32,
-        // padding inside each section
-        // inside_padding: f32,
-        // left_padding: f32,
-        // hashmap of all positions
-        pub x_positions: HashMap<Pressed, PianoRollRect>,
-    }
-
-    impl PianoRoll {
-        pub fn new(background: &Theme) -> Self {
-            let section_width = (&background.width / 12.0).round();
-            let extra_width = (&background.width % 12.0).round();
-            let inside_padding = 5.0;
-            let rect_width = section_width - (inside_padding * 2.0);
-            let left_padding = extra_width / 2.0;
-
-            let mut x_positions = HashMap::new();
-            x_positions.insert(
-                Pressed::Left,
-                PianoRollRect::new(left_padding + inside_padding),
-            );
-            x_positions.insert(
-                Pressed::Up,
-                PianoRollRect::new(x_positions[&Pressed::Left].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::Down,
-                PianoRollRect::new(x_positions[&Pressed::Up].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::Right,
-                PianoRollRect::new(x_positions[&Pressed::Down].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::L,
-                PianoRollRect::new(x_positions[&Pressed::Right].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::Select,
-                PianoRollRect::new(x_positions[&Pressed::L].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::Start,
-                PianoRollRect::new(x_positions[&Pressed::Select].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::R,
-                PianoRollRect::new(x_positions[&Pressed::Start].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::Y,
-                PianoRollRect::new(x_positions[&Pressed::R].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::B,
-                PianoRollRect::new(x_positions[&Pressed::Y].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::X,
-                PianoRollRect::new(x_positions[&Pressed::B].x + section_width),
-            );
-            x_positions.insert(
-                Pressed::A,
-                PianoRollRect::new(x_positions[&Pressed::X].x + section_width),
-            );
-
-            Self {
-                rect_width,
-                x_positions,
-            }
-        }
-
-        pub fn update(&mut self, (_, window_height): (f32, f32), events: &[Pressed]) {
-            for (_, position) in self.x_positions.iter_mut() {
-                position.update(&window_height);
-            }
-
-            for event in events.iter() {
-                let piano_roll_rect = self.x_positions.get_mut(event).unwrap();
-                piano_roll_rect.add(&window_height, &self.rect_width)
-            }
-        }
-    }
-
-    pub struct PianoRollRect {
-        x: f32,
-        pub positions: Vec<Rect>,
-    }
-
-    impl PianoRollRect {
-        pub fn new(x: f32) -> Self {
-            Self {
-                x,
-                positions: Vec::new(),
-            }
-        }
-
-        pub fn add(&mut self, window_height: &f32, rect_width: &f32) {
-            self.positions.push(Rect {
-                x: self.x,
-                y: *window_height / 2.0,
-                w: *rect_width,
-                h: 1.0,
-            })
-        }
-
-        pub fn update(&mut self, window_height: &f32) {
-            for rect in self.positions.iter_mut() {
-                rect.y += 1.0;
-            }
-
-            // remove Rect from Vector if y position is larger than window height
-            if !self.positions.is_empty() && self.positions[0].y > *window_height {
-                self.positions.remove(0);
-            }
-            dbg!(&self.positions);
-        }
-
-        // pub fn Display {}
-    }
 }

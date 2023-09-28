@@ -18,7 +18,7 @@ use configuration::config::AppConfig;
 const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
-    config: AppConfig,
+    // config: AppConfig,
     controller: Controller,
     skin: Skin,
     client: SyncClient,
@@ -47,21 +47,16 @@ impl InputViewer {
         let info = client.info()?;
         println!("Attached to {} - {}", info.dev_type, info.version);
 
-        let window_height = match config.skin.piano_roll {
-            true => skin.background.height * 2.0,
-            false => skin.background.height,
-        };
-
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {
             width: skin.background.image.width() as f32,
-            height: window_height,
+            height: skin.background.height,
             resizable: true,
             ..Default::default()
         })?;
 
         Ok(Self {
-            config,
+            // config,
             controller,
             skin,
             client,
@@ -88,10 +83,6 @@ impl event::EventHandler for InputViewer {
         // Draw background
         canvas.draw(&self.skin.background.image, DrawParam::new());
 
-        if self.config.skin.piano_roll {
-            self.skin.piano_roll.update(ctx.gfx.size(), &self.events);
-        }
-
         // Draw inputs
         for event in self.events.iter() {
             let button_image = &self.skin.buttons[event].image;
@@ -99,13 +90,6 @@ impl event::EventHandler for InputViewer {
                 button_image,
                 DrawParam::default().dest(self.skin.buttons[event].rect.point()),
             );
-            if self.config.skin.piano_roll {
-                for rollrects in self.skin.piano_roll.x_positions.values() {
-                    for rect in rollrects.positions.iter() {
-                        canvas.draw(button_image, DrawParam::new().dest(rect.point()))
-                    }
-                }
-            }
         }
 
         canvas.finish(ctx)
