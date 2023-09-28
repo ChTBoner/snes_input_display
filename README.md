@@ -105,6 +105,8 @@ If not working, you can try to figure it out with an Emulator like Bizhawk
 - The Legend of Zelda: A Link to the Past
 - The Lion King
 
+- SMZ3 Randomizers
+
 Please tell me games that also work so I can add them to the list
 
 ## TODO
