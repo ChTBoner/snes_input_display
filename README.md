@@ -31,8 +31,6 @@ input_config_path = './confs/SuperMetroid.json'
 skins_path = 'C:\Users\example\Documents/squabbler-retrospy-nintendospy-skins\skins'
 skin_name = "snes-super-famicom-squabbler"
 skin_theme = "black"
-#piano_rool = "true"
-piano_rool = "false"
 
 ```
 A settings file example can be found [here](confs/settings.toml)
