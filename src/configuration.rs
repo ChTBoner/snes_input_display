@@ -14,6 +14,7 @@ pub mod config {
         pub skins_path: PathBuf,
         pub skin_name: String,
         pub skin_theme: String,
+        pub piano_roll: bool,
     }
 
     #[derive(Deserialize, Debug)]
@@ -31,8 +32,7 @@ pub mod config {
             let config_file_path = config_file_path.to_str().unwrap();
             let s = Config::builder()
                 .add_source(config::File::with_name(config_file_path))
-                .build()
-                .unwrap();
+                .build()?;
 
             s.try_deserialize()
         }

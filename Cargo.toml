@@ -1,6 +1,6 @@
 [package]
 name = "snes_input_display"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 
@@ -14,12 +14,8 @@ strum_macros = "0.25"
 bitvec = "1"
 quick-xml = { version = "0.30", features = ["overlapped-lists", "serialize"] }
 image = "0.24"
-imageinfo = "0.7"
+# imageinfo = "0.7"
 config = "0.13"
 dirs = "5"
+ggez = "0.9"
 rusb2snes = "0.1"
-
-[dependencies.sdl2]
-version = "0.35"
-default-features = false
-features = ["image"]
