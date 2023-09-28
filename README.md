@@ -79,9 +79,33 @@ https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
 You should try with Defaults.json
 If not working, you can try to figure it out with an Emulator like Bizhawk
 
-- Super Metroid
-- Super Castlevania IV
+- Aladdin
+- Axelay
 - Castlevania Dracula X
+- Contra 3
+- Double Dragon V
+- F-Zero
+- Fatal Fury 1, 2, Special
+- Final Fight 1, 2 and Guy (Not Final Fight 3)
+- Illusion of Gaia
+- Killer Instinct
+- Lufia II - Rise of the Sinistrals
+- Lufia, The Fortress of Doom
+- Mortal Kombat 1, 3 (Not 2)
+- NBA JAM (included Tournament Edition)
+- NBA Live 95, 96, 97, 98
+- NBA Showdown
+- Secret of Mana
+- Super Castlevania IV
+- Super Ghouls n'Ghosts
+- Super Mario Kart
+- Super Mario World
+- Super Metroid
+- The Blues Brothers
+- The Legend of Zelda: A Link to the Past
+- The Lion King
+
+Please tell me games that also work so I can add them to the list
 
 ## TODO
 - Configuration via GUI

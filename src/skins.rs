@@ -85,14 +85,7 @@ pub mod skin {
         }
 
         fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: &String) -> Option<Theme> {
-            for background in backgrounds_vec {
-                dbg!(&background);
-                dbg!(&theme);
-                if background.theme.eq(theme) {
-                    return Some(background);
-                }
-            }
-            None
+            backgrounds_vec.into_iter().find(|background| background.theme.eq(theme))
         }
 
         fn parse_buttons(buttons_vec: Vec<Button>) -> HashMap<Pressed, Button> {
@@ -189,5 +182,4 @@ pub mod skin {
         }
         attributes_map
     }
-
 }
