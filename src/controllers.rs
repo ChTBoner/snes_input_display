@@ -54,7 +54,7 @@ pub mod controller {
 
         pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<Pressed>, Error> {
             let inputs = client.get_address(self.address, self.size)?;
-            let bits = inputs.view_bits::<Msb0>();
+            let bits = inputs.view_bits::<Lsb0>();
             let mut inputs: Vec<Pressed> = Vec::new();
 
             if bits[self.button_layout.a] {
