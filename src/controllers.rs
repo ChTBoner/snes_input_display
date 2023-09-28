@@ -7,22 +7,6 @@ pub mod controller {
 
     use rusb2snes::SyncClient;
 
-    #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-    pub enum Pressed {
-        A,
-        B,
-        X,
-        Y,
-        L,
-        R,
-        Select,
-        Start,
-        Up,
-        Down,
-        Left,
-        Right,
-    }
-
     #[derive(Deserialize, Debug)]
     pub struct ButtonLayout {
         pub b: usize,
@@ -52,46 +36,46 @@ pub mod controller {
             serde_json::from_str(&config_data).expect("Unable to parse")
         }
 
-        pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<Pressed>, Error> {
+        pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<&str>, Error> {
             let inputs = client.get_address(self.address, self.size)?;
             let bits = inputs.view_bits::<Msb0>();
-            let mut inputs: Vec<Pressed> = Vec::new();
+            let mut inputs = Vec::new();
 
             if bits[self.button_layout.a] {
-                inputs.push(Pressed::A);
+                inputs.push("a");
             };
             if bits[self.button_layout.x] {
-                inputs.push(Pressed::X);
+                inputs.push("x");
             };
             if bits[self.button_layout.b] {
-                inputs.push(Pressed::B);
+                inputs.push("b");
             };
             if bits[self.button_layout.y] {
-                inputs.push(Pressed::Y);
+                inputs.push("y");
             };
             if bits[self.button_layout.select] {
-                inputs.push(Pressed::Select);
+                inputs.push("select");
             };
             if bits[self.button_layout.start] {
-                inputs.push(Pressed::Start);
+                inputs.push("start");
             };
             if bits[self.button_layout.up] {
-                inputs.push(Pressed::Up);
+                inputs.push("up");
             };
             if bits[self.button_layout.down] {
-                inputs.push(Pressed::Down);
+                inputs.push("down");
             };
             if bits[self.button_layout.left] {
-                inputs.push(Pressed::Left);
+                inputs.push("left");
             };
             if bits[self.button_layout.right] {
-                inputs.push(Pressed::Right);
+                inputs.push("right");
             };
             if bits[self.button_layout.l] {
-                inputs.push(Pressed::L);
+                inputs.push("l");
             };
             if bits[self.button_layout.r] {
-                inputs.push(Pressed::R);
+                inputs.push("r");
             };
             Ok(inputs)
         }
