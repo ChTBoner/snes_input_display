@@ -1,6 +1,8 @@
 # Snes controller input display
-Displays your SNES input reading directly from the console data
+Displays your SNES input reading directly from the console data, built in Rust with ggez
+
 Completely compatible with the [RetroSpy](https://retro-spy.com) format for Super Nintendo controllers.
+
 You can find great skins here: https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
 image.png
 
@@ -72,12 +74,6 @@ SNI or QUSB2SNES must be up and running and connected to a powered on console.
 [Skarsnik](https://github.com/Skarsnik)
 
 https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
-
-## Build instructions
-To build you will need the SDL2 and SDL2_images libs installed and the rustup toolchain.
-
-[INSTALL - SDL2 WIKI](https://wiki.libsdl.org/SDL2/Installation)
-
 
 ## TODO
 - Configuration via GUI
