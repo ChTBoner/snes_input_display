@@ -14,7 +14,6 @@ pub mod config {
         pub skins_path: PathBuf,
         pub skin_name: String,
         pub skin_theme: String,
-        pub piano_roll: bool,
     }
 
     #[derive(Deserialize, Debug)]

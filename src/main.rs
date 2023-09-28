@@ -63,10 +63,6 @@ impl InputViewer {
             events: Vec::new(),
         })
     }
-
-    // fn piano_roll(self) {
-    //     se
-    // }
 }
 
 impl event::EventHandler for InputViewer {
