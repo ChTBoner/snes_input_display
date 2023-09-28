@@ -2,38 +2,39 @@
 mod configuration;
 mod controllers;
 mod skins;
-// mod viewer;
-use controllers::controller::{Buttons, Controller};
+use controllers::controller::{Controller, Pressed};
 
 use ggez::{
     conf, event,
     graphics::{self, DrawParam},
     Context, ContextBuilder, GameResult,
 };
-use quick_xml::se;
 use rusb2snes::SyncClient;
-use skins::skin::{Skin, PianoRoll, PianoRollRect};
-// use std::collections::HashMap;
+use skins::skin::Skin;
 use std::error::Error;
-// use viewer::InputViewer;
 
 use configuration::config::AppConfig;
 
-const APP_NAME: &'static str = "Snes Input Display";
+const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
     config: AppConfig,
     controller: Controller,
     skin: Skin,
     client: SyncClient,
-    events: Vec<Buttons>,
+    events: Vec<Pressed>,
 }
 
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller.input_config_path);
 
-        let skin = Skin::new(&config.skin.skins_path, &config.skin.skin_name, &config.skin.skin_theme, ctx)?;
+        let skin = Skin::new(
+            &config.skin.skins_path,
+            &config.skin.skin_name,
+            &config.skin.skin_theme,
+            ctx,
+        )?;
 
         /* Connect to USB2SNES Server */
         let mut client = SyncClient::connect()?;
@@ -74,7 +75,7 @@ impl InputViewer {
 }
 
 impl event::EventHandler for InputViewer {
-    fn update(&mut self, ctx: &mut Context) -> GameResult {
+    fn update(&mut self, _ctx: &mut Context) -> GameResult {
         // Update code here...
         // const DESIRED_FPS: u32 = 60;
         self.events = self.controller.pushed(&mut self.client).unwrap();
@@ -83,12 +84,9 @@ impl event::EventHandler for InputViewer {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
-        
+
         // Draw background
-        canvas.draw(
-            &self.skin.background.image,
-            DrawParam::new(),
-        );
+        canvas.draw(&self.skin.background.image, DrawParam::new());
 
         if self.config.skin.piano_roll {
             self.skin.piano_roll.update(ctx.gfx.size(), &self.events);
@@ -96,25 +94,22 @@ impl event::EventHandler for InputViewer {
 
         // Draw inputs
         for event in self.events.iter() {
-            let button_image = &self.skin.buttons[&event].image;
+            let button_image = &self.skin.buttons[event].image;
             canvas.draw(
                 button_image,
-                DrawParam::default().dest(self.skin.buttons[&event].rect.point()),
+                DrawParam::default().dest(self.skin.buttons[event].rect.point()),
             );
             if self.config.skin.piano_roll {
-                for (_, rollrects) in &self.skin.piano_roll.x_positions {
+                for rollrects in self.skin.piano_roll.x_positions.values() {
                     for rect in rollrects.positions.iter() {
                         canvas.draw(button_image, DrawParam::new().dest(rect.point()))
                     }
                 }
             }
         }
-        
 
         canvas.finish(ctx)
     }
-
-    
 }
 
 fn main() -> Result<GameResult, Box<dyn Error>> {

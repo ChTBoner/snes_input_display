@@ -1,24 +1,21 @@
 pub mod skin {
     use ggez::{
-        graphics::{Image, Rect, Canvas},
+        graphics::{Image, Rect},
         Context,
     };
-    use quick_xml::events::{BytesStart, Event};
-    use quick_xml::reader::Reader;
-    use std::collections::HashMap;
-    use std::error::Error;
-    use std::fs;
-    use std::io::Read;
-    use std::path::Path;
-    use std::path::PathBuf;
+    use quick_xml::{
+        events::{BytesStart, Event},
+        reader::Reader,
+    };
+    use std::{collections::HashMap, error::Error, fs, io::Read, path::Path, path::PathBuf};
 
-    use crate::controllers::controller::Buttons;
+    use crate::controllers::controller::Pressed;
 
     // #[derive(Debug)]
     pub struct Skin {
         // pub metadata: HashMap<String, String>,
-        pub background: Background,
-        pub buttons: HashMap<Buttons, Button>,
+        pub background: Theme,
+        pub buttons: HashMap<Pressed, Button>,
         pub directory: PathBuf,
         pub name: String,
         pub theme: String,
@@ -33,7 +30,7 @@ pub mod skin {
             ctx: &mut Context,
         ) -> Result<Skin, Box<dyn Error>> {
             let skin_filename = "skin.xml";
-            let file_path = path.join(&name).join(skin_filename);
+            let file_path = path.join(name).join(skin_filename);
             let directory = file_path.parent().unwrap().to_owned();
 
             let (backgrounds, buttons) = Self::get_layout(file_path, name, ctx)?;
@@ -51,13 +48,13 @@ pub mod skin {
 
         fn get_layout(
             file_path: PathBuf,
-            name: &String,
+            name: &str,
             ctx: &mut Context,
-        ) -> Result<(Vec<Background>, Vec<Button>), Box<dyn Error>> {
+        ) -> Result<(Vec<Theme>, Vec<Button>), Box<dyn Error>> {
             let file = Self::load_file(&file_path);
             let mut reader = Reader::from_str(&file);
             let mut _metadata: HashMap<String, String> = HashMap::new();
-            let mut backgrounds: Vec<Background> = Vec::new();
+            let mut backgrounds: Vec<Theme> = Vec::new();
             let mut buttons: Vec<Button> = Vec::new();
 
             loop {
@@ -65,11 +62,11 @@ pub mod skin {
                     // Ok(Event::Start(t)) => _metadata = parse_attributes(t),
                     Ok(Event::Empty(t)) => match t.name().as_ref() {
                         b"background" => {
-                            let bg = Background::new(t, &name, ctx)?;
+                            let bg = Theme::new(t, name, ctx)?;
                             backgrounds.push(bg);
                         }
                         b"button" => {
-                            let bt = Button::new(t, &name, ctx)?;
+                            let bt = Button::new(t, name, ctx)?;
                             buttons.push(bt);
                         }
                         _ => {}
@@ -89,10 +86,7 @@ pub mod skin {
             text
         }
 
-        fn parse_backgrounds(
-            backgrounds_vec: Vec<Background>,
-            theme: &String,
-        ) -> Option<Background> {
+        fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: &String) -> Option<Theme> {
             for background in backgrounds_vec {
                 dbg!(&background);
                 dbg!(&theme);
@@ -103,7 +97,7 @@ pub mod skin {
             None
         }
 
-        fn parse_buttons(buttons_vec: Vec<Button>) -> HashMap<Buttons, Button> {
+        fn parse_buttons(buttons_vec: Vec<Button>) -> HashMap<Pressed, Button> {
             let mut buttons = HashMap::new();
             for button in buttons_vec {
                 buttons.insert(button.name, button);
@@ -113,14 +107,14 @@ pub mod skin {
     }
 
     #[derive(Debug, Clone)]
-    pub struct Background {
+    pub struct Theme {
         pub theme: String,
         pub image: Image,
         pub width: f32,
         pub height: f32,
     }
 
-    impl Background {
+    impl Theme {
         fn new(t: BytesStart, dir: &str, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
             let attributes = parse_attributes(t);
             let image_path = Path::new("/").join(dir).join(&attributes["image"]);
@@ -139,7 +133,7 @@ pub mod skin {
 
     #[derive(Debug)]
     pub struct Button {
-        pub name: Buttons,
+        pub name: Pressed,
         pub image: Image,
         pub rect: Rect,
     }
@@ -157,18 +151,18 @@ pub mod skin {
             let height = image.height() as f32;
 
             let name = match attributes["name"].as_str() {
-                "a" => Buttons::A,
-                "b" => Buttons::B,
-                "x" => Buttons::X,
-                "y" => Buttons::Y,
-                "select" => Buttons::Select,
-                "start" => Buttons::Start,
-                "l" => Buttons::L,
-                "r" => Buttons::R,
-                "up" => Buttons::Up,
-                "down" => Buttons::Down,
-                "left" => Buttons::Left,
-                "right" => Buttons::Right,
+                "a" => Pressed::A,
+                "b" => Pressed::B,
+                "x" => Pressed::X,
+                "y" => Pressed::Y,
+                "select" => Pressed::Select,
+                "start" => Pressed::Start,
+                "l" => Pressed::L,
+                "r" => Pressed::R,
+                "up" => Pressed::Up,
+                "down" => Pressed::Down,
+                "left" => Pressed::Left,
+                "right" => Pressed::Right,
                 _ => panic!(),
             };
 
@@ -200,103 +194,91 @@ pub mod skin {
 
     pub struct PianoRoll {
         // width of section reserved for each button
-        section_width: f32,
+        // section_width: f32,
         // extra space left after division: modulo of section_width calculation
-        extra_width: f32,
+        // extra_width: f32,
         rect_width: f32,
         // padding inside each section
-        inside_padding: f32,
-        left_padding: f32,
+        // inside_padding: f32,
+        // left_padding: f32,
         // hashmap of all positions
-        pub x_positions: HashMap<Buttons, PianoRollRect>,
+        pub x_positions: HashMap<Pressed, PianoRollRect>,
     }
 
     impl PianoRoll {
-        pub fn new(background: &Background) -> Self {
-            let section_width = &background.width / 12.0;
-            let extra_width = &background.width % 12.0;
+        pub fn new(background: &Theme) -> Self {
+            let section_width = (&background.width / 12.0).round();
+            let extra_width = (&background.width % 12.0).round();
             let inside_padding = 5.0;
             let rect_width = section_width - (inside_padding * 2.0);
             let left_padding = extra_width / 2.0;
 
             let mut x_positions = HashMap::new();
             x_positions.insert(
-                Buttons::Left,
+                Pressed::Left,
                 PianoRollRect::new(left_padding + inside_padding),
             );
             x_positions.insert(
-                Buttons::Up,
-                PianoRollRect::new(x_positions[&Buttons::Left].x + section_width),
+                Pressed::Up,
+                PianoRollRect::new(x_positions[&Pressed::Left].x + section_width),
             );
             x_positions.insert(
-                Buttons::Down,
-                PianoRollRect::new(x_positions[&Buttons::Up].x + section_width),
+                Pressed::Down,
+                PianoRollRect::new(x_positions[&Pressed::Up].x + section_width),
             );
             x_positions.insert(
-                Buttons::Right,
-                PianoRollRect::new(x_positions[&Buttons::Down].x + section_width),
+                Pressed::Right,
+                PianoRollRect::new(x_positions[&Pressed::Down].x + section_width),
             );
             x_positions.insert(
-                Buttons::L,
-                PianoRollRect::new(x_positions[&Buttons::Right].x + section_width),
+                Pressed::L,
+                PianoRollRect::new(x_positions[&Pressed::Right].x + section_width),
             );
             x_positions.insert(
-                Buttons::Select,
-                PianoRollRect::new(x_positions[&Buttons::L].x + section_width),
+                Pressed::Select,
+                PianoRollRect::new(x_positions[&Pressed::L].x + section_width),
             );
             x_positions.insert(
-                Buttons::Start,
-                PianoRollRect::new(x_positions[&Buttons::Select].x + section_width),
+                Pressed::Start,
+                PianoRollRect::new(x_positions[&Pressed::Select].x + section_width),
             );
             x_positions.insert(
-                Buttons::R,
-                PianoRollRect::new(x_positions[&Buttons::Start].x + section_width),
+                Pressed::R,
+                PianoRollRect::new(x_positions[&Pressed::Start].x + section_width),
             );
             x_positions.insert(
-                Buttons::Y,
-                PianoRollRect::new(x_positions[&Buttons::R].x + section_width),
+                Pressed::Y,
+                PianoRollRect::new(x_positions[&Pressed::R].x + section_width),
             );
             x_positions.insert(
-                Buttons::B,
-                PianoRollRect::new(x_positions[&Buttons::Y].x + section_width),
+                Pressed::B,
+                PianoRollRect::new(x_positions[&Pressed::Y].x + section_width),
             );
             x_positions.insert(
-                Buttons::X,
-                PianoRollRect::new(x_positions[&Buttons::B].x + section_width),
+                Pressed::X,
+                PianoRollRect::new(x_positions[&Pressed::B].x + section_width),
             );
             x_positions.insert(
-                Buttons::A,
-                PianoRollRect::new(x_positions[&Buttons::X].x + section_width),
+                Pressed::A,
+                PianoRollRect::new(x_positions[&Pressed::X].x + section_width),
             );
 
             Self {
-                section_width,
-                extra_width,
-                inside_padding,
                 rect_width,
-                left_padding,
                 x_positions,
             }
         }
 
-        pub fn update(&mut self, (_, window_height): (f32, f32), events: &Vec<Buttons>) {
+        pub fn update(&mut self, (_, window_height): (f32, f32), events: &[Pressed]) {
             for (_, position) in self.x_positions.iter_mut() {
                 position.update(&window_height);
             }
 
-            for event in events.into_iter() {
+            for event in events.iter() {
                 let piano_roll_rect = self.x_positions.get_mut(event).unwrap();
                 piano_roll_rect.add(&window_height, &self.rect_width)
             }
         }
-
-        // pub fn display(self, canvas: &Canvas) {
-        //     for (button, rollrects) in self.x_positions.iter() {
-        //         for rect in rollrects.positions {
-        //             canvas.draw(drawable, param)
-        //         }
-        //     }
-        // }
     }
 
     pub struct PianoRollRect {
