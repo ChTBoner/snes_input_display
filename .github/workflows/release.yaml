@@ -26,3 +26,4 @@ jobs:
           RUSTTARGET: ${{ matrix.target }}
           ARCHIVE_TYPES: ${{ matrix.archive }}
           EXTRA_FILES: "README.md LICENSE confs/"
+          TOOLCHAIN_VERSION: stable
