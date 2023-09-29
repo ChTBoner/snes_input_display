@@ -12,7 +12,7 @@ use ggez::{
 };
 use quick_xml::se;
 use rusb2snes::SyncClient;
-use skins::skin::{Skin, PianoRoll, PianoRollRect};
+use skins::skin::{PianoRoll, PianoRollRect, Skin};
 // use std::collections::HashMap;
 use std::error::Error;
 // use viewer::InputViewer;
@@ -33,7 +33,12 @@ impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller.input_config_path);
 
-        let skin = Skin::new(&config.skin.skins_path, &config.skin.skin_name, &config.skin.skin_theme, ctx)?;
+        let skin = Skin::new(
+            &config.skin.skins_path,
+            &config.skin.skin_name,
+            &config.skin.skin_theme,
+            ctx,
+        )?;
 
         /* Connect to USB2SNES Server */
         let mut client = SyncClient::connect()?;
@@ -83,18 +88,15 @@ impl event::EventHandler for InputViewer {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
-        
+
         // Draw background
-        canvas.draw(
-            &self.skin.background.image,
-            DrawParam::new(),
-        );
+        canvas.draw(&self.skin.background.image, DrawParam::new());
 
         if self.config.skin.piano_roll {
             self.skin.piano_roll.update(ctx.gfx.size(), &self.events);
         }
 
-        // Draw inputs
+        //   Draw inputs
         for event in self.events.iter() {
             let button_image = &self.skin.buttons[&event].image;
             canvas.draw(
@@ -109,12 +111,9 @@ impl event::EventHandler for InputViewer {
                 }
             }
         }
-        
 
         canvas.finish(ctx)
     }
-
-    
 }
 
 fn main() -> Result<GameResult, Box<dyn Error>> {
