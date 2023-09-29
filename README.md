@@ -7,7 +7,6 @@ You can find great skins here: https://github.com/developwisely/squabbler-retros
 image.png
 
 
-
 ![image info](images/snes_controller.png)
 
 
@@ -36,7 +35,7 @@ skin_theme = "black"
 
 
 ```
-A settings file example can be found [here](confs/settings.toml)
+A settings file example can be found [here](https://github.com/ChTBoner/snes_input_display)
 
 ## Game List Working with Defaults.json
 You should try with Defaults.json
