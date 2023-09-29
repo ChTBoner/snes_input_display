@@ -108,6 +108,8 @@ SNI or QUSB2SNES must be up and running and connected to a powered on console.
 https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
 
 
-
 ## TODO
 - Configuration via GUI
+- Better error management
+
+GNU GPLv3
