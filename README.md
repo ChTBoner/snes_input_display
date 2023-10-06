@@ -76,7 +76,7 @@ The controller config file must be in the json format
 ```json
 {
     // location in WRAM where input data, sadly not in hex format.
-    "address": 16056459,
+    "address": "F90718",
     // size in bytes of the input data
     "size": 2,
     // location of each button in the array of bits provided by usb2snes
