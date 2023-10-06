@@ -1,11 +1,11 @@
 {
-    "address": 16059810,
+    "address": "F50DA2",
     "size": 4,
     "button_layout": {
         "a": 23,
         "x": 22,
-        "b": 15,
-        "y": 14,
+        "b": 7,
+        "y": 6,
         "select": 5,
         "start": 4,
         "up": 3,

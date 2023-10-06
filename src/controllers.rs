@@ -3,7 +3,7 @@ pub mod controller {
     use serde::Deserialize;
     use serde_json;
     use std::{fs, path::Path};
-    use tungstenite::error::Error;
+    use std::error::Error;
 
     use rusb2snes::SyncClient;
 
@@ -41,7 +41,7 @@ pub mod controller {
 
     #[derive(Deserialize, Debug)]
     pub struct Controller {
-        pub address: u32,
+        pub address: String,
         pub size: usize,
         pub button_layout: ButtonLayout,
     }
@@ -52,8 +52,8 @@ pub mod controller {
             serde_json::from_str(&config_data).expect("Unable to parse")
         }
 
-        pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<Pressed>, Error> {
-            let inputs = client.get_address(self.address, self.size)?;
+        pub fn pushed(&self, client: &mut SyncClient) -> Result<Vec<Pressed>, Box<dyn Error>> {
+            let inputs = client.get_address(u32::from_str_radix(&self.address, 16)?, self.size)?;
             let bits = inputs.view_bits::<Lsb0>();
             let mut inputs: Vec<Pressed> = Vec::new();
 
