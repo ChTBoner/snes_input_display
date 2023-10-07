@@ -1,5 +1,8 @@
-on: release
-
+on: push
+        
+env:
+    CARGO_TERM_COLOR: always
+  
 jobs:
     build:
       strategy:
@@ -31,3 +34,9 @@ jobs:
         run: cargo check --all-targets
         env:
           RUSTFLAGS: "-D warnings"
+  
+      - name: Run cargo test w/ -D warnings
+        if: ${{ runner.os == 'Linux' }}
+        run: cargo build --release
+        
+  
