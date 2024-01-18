@@ -29,6 +29,7 @@ pub mod config {
                 .join("snes-input-display")
                 .join("settings");
             let config_file_path = config_file_path.to_str().unwrap();
+            dbg!(&config_file_path);
             let s = Config::builder()
                 .add_source(config::File::with_name(config_file_path))
                 .build()?;

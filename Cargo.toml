@@ -11,9 +11,9 @@ lto = true
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tungstenite = "0.20"
+tungstenite = "0.21"
 bitvec = "1"
-quick-xml = { version = "0.30", features = ["overlapped-lists", "serialize"] }
+quick-xml = { version = "0.31", features = ["overlapped-lists", "serialize"] }
 config = "0.13"
 dirs = "5"
 ggez = "0.9"
