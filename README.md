@@ -110,5 +110,6 @@ https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
 ## TODO
 - Configuration via GUI
 - Better error management
+- Default setup on startup
 
 GNU GPLv3
