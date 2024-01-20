@@ -48,6 +48,7 @@ $ chmod +x snes_input_display_mac_amd64
 
 ## Game List Working with Defaults.json
 You should try with Defaults.json
+
 If not working, you can try to figure it out with an Emulator like Bizhawk
 
 - Aladdin
@@ -75,9 +76,9 @@ If not working, you can try to figure it out with an Emulator like Bizhawk
 - The Blues Brothers
 - The Legend of Zelda: A Link to the Past
 - The Lion King
-
 - SMZ3 Randomizers
 
+This list is in no way complete.
 Please tell me games that also work so I can add them to the list or if you figure out other layouts
 
 ### Controller config file
