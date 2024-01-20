@@ -36,6 +36,15 @@ skin_theme = "Black"
 ```
 A settings file example can be found [here](https://github.com/ChTBoner/snes_input_display)
 
+## For Linux and MacOS
+Dont forget to set the correct permission on the file to allow it to execute
+```sh
+$ cd /path/to/snes_input_viewer/folder
+# Linux
+$ chmod +x snes_input_display_linux_amd64
+# MacOS
+$ chmod +x snes_input_display_mac_amd64
+```
 
 ## Game List Working with Defaults.json
 You should try with Defaults.json
@@ -75,10 +84,12 @@ Please tell me games that also work so I can add them to the list or if you figu
 The controller config file must be in the json format
 ```json
 {
+    // Address in hexadecimal to watch
+    // should be F5XXXX - F90718 is an address that works with many games on FxPakPro/SD2SNES
     "address": "F90718",
     // size in bytes of the input data
     "size": 2,
-    // location of each button in the array of bits provided by usb2snes
+    // location of each button in the array of bits provided by usb2snes. Little Endian
     "button_layout": 
         {
             "a": 0,
