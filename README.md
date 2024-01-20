@@ -75,7 +75,6 @@ Please tell me games that also work so I can add them to the list or if you figu
 The controller config file must be in the json format
 ```json
 {
-    // location in WRAM where input data, sadly not in hex format.
     "address": "F90718",
     // size in bytes of the input data
     "size": 2,
