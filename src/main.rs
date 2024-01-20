@@ -1,8 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod configuration;
-mod controllers;
+mod controller;
 mod skins;
-use controllers::controller::{Controller, Pressed};
+use controller::{ButtonState, Controller};
 
 use ggez::{
     conf, event,
@@ -10,10 +10,10 @@ use ggez::{
     Context, ContextBuilder, GameResult,
 };
 use rusb2snes::SyncClient;
-use skins::skin::Skin;
+use skins::Skin;
 use std::error::Error;
 
-use configuration::config::AppConfig;
+use configuration::AppConfig;
 
 const APP_NAME: &str = "Snes Input Display";
 
@@ -22,7 +22,7 @@ struct InputViewer {
     controller: Controller,
     skin: Skin,
     client: SyncClient,
-    events: Vec<Pressed>,
+    events: ButtonState,
 }
 
 impl InputViewer {
@@ -45,8 +45,7 @@ impl InputViewer {
         let devices = client.list_device()?;
 
         client.attach(&devices[0])?;
-        let info = client.info()?;
-        println!("Attached to {} - {}", info.dev_type, info.version);
+        let _info = client.info()?;
 
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {
@@ -61,7 +60,7 @@ impl InputViewer {
             controller,
             skin,
             client,
-            events: Vec::new(),
+            events: ButtonState::default(),
         })
     }
 }
@@ -81,13 +80,13 @@ impl event::EventHandler for InputViewer {
         canvas.draw(&self.skin.background.image, DrawParam::new());
 
         // Draw inputs
-        for event in self.events.iter() {
+        self.events.iter().for_each(|event| {
             let button_image = &self.skin.buttons[event].image;
             canvas.draw(
                 button_image,
                 DrawParam::default().dest(self.skin.buttons[event].rect.point()),
             );
-        }
+        });
 
         canvas.finish(ctx)
     }
