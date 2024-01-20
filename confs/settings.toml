@@ -3,7 +3,11 @@
 input_config_path = './confs/Defaults.json'
 
 [skin]
+# skins_path: Folder where all your Retrospy skins are stored
 # skins_path = '/home/example/Documents/squabbler-retrospy-nintendospy-skins/skins'
 skins_path = 'C:\Users\example\Documents\squabbler-retrospy-nintendospy-skins\skins'
+# skins_name: Folder name of the skin you want to use
 skin_name = "snes-super-famicom-squabbler"
+# skins_theme = value '<background name> you want to use, found in the theme's xml file' 
+# ex: <background name="Black" image="input-display-overlay-famicom.png" />
 skin_theme = "black"

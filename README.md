@@ -23,19 +23,19 @@ Requires a configuration file named "settings.toml" at this location:
 
 Paths must be in between single quotes
 ```toml
-[controller]
-# paths should be in between single quotes
-input_config_path = './confs/Defaults.json'
-
 [skin]
+# skins_path: Folder where all your Retrospy skins are stored
 # skins_path = '/home/example/Documents/squabbler-retrospy-nintendospy-skins/skins'
-skins_path = 'C:\Users\example\Documents/squabbler-retrospy-nintendospy-skins\skins'
+skins_path = 'C:\Users\example\Documents\squabbler-retrospy-nintendospy-skins\skins'
+# skins_name: Folder name of the skin you want to use
 skin_name = "snes-super-famicom-squabbler"
-skin_theme = "black"
-
+# skins_theme = value of '<background name> you want to use, found in the theme's xml file'
+# ex: <background name="Black" image="input-display-overlay-famicom.png" />
+skin_theme = "Black"
 
 ```
 A settings file example can be found [here](https://github.com/ChTBoner/snes_input_display)
+
 
 ## Game List Working with Defaults.json
 You should try with Defaults.json
@@ -97,6 +97,8 @@ The controller config file must be in the json format
         }
 }
 ```
+
+Will not work with Super FX and SA-1 games
 
 ## TROUBLESHOOTING
 SNI or QUSB2SNES must be up and running and connected to a powered on console.
