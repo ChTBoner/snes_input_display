@@ -3,9 +3,11 @@ use config::{Config, ConfigError};
 use serde::Deserialize;
 use std::path::PathBuf;
 
+
 #[derive(Deserialize, Debug)]
 pub struct ControllerConfig {
     pub input_config_path: PathBuf,
+    pub layout: String,
 }
 
 #[derive(Deserialize, Debug)]

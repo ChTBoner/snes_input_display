@@ -1,4 +1,16 @@
 {
-    "address_low": "F90718",
-    "address_high": "F90719"
+    "layouts": {
+        "Default": {
+            "address_low": "F90718",
+            "address_high": "F90719"
+        },
+        "Super Mario World": {
+            "address_low": "F50DA4",
+            "address_high": "F50DA2"
+        },
+        "Ninja Gaiden Trilogy": {
+            "address_low": "F5127A",
+            "address_high": "F5127B"
+        }
+    }
 }
