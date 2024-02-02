@@ -15,7 +15,7 @@ image.png
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
 - Sd2Snes or FxPak Pro for original hardware
 
-NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), but not with the Default layout.
+NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), and [bsnes-plus](https://github.com/black-sliver/bsnes-plus.git) not with the Default layout.
 
 ## Configuration
 Requires a configuration file named "settings.toml" at this location:
