@@ -1,6 +1,7 @@
 [controller]
 # paths should be in between single quotes
 input_config_path = './confs/Defaults.json'
+layout = "Default"
 
 [skin]
 # skins_path: Folder where all your Retrospy skins are stored

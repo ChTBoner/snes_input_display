@@ -1,6 +1,8 @@
 use serde::{Deserialize, Deserializer};
 use std::error::Error;
-use std::{fs, path::Path};
+use std::{fs, collections::HashMap};
+
+use crate::configuration::ControllerConfig;
 
 use rusb2snes::SyncClient;
 
@@ -103,7 +105,12 @@ impl Iterator for ButtonsIter {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
+pub struct ControllerLayouts {
+    pub layouts: HashMap<String, Controller>
+}
+
+#[derive(Deserialize, Debug, Clone, Copy)]
 pub struct Controller {
     #[serde(deserialize_with = "hex_to_u32")]
     pub address_low: u32,
@@ -112,9 +119,10 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn new(config_path: &Path) -> Self {
-        let config_data = fs::read_to_string(config_path).expect("Unable to config file");
-        serde_json::from_str(&config_data).expect("Unable to parse")
+    pub fn new(config: &ControllerConfig) -> Self {
+        let config_data = fs::read_to_string(&config.input_config_path).expect("Unable open to config file");
+        let layouts_data: ControllerLayouts = serde_json::from_str(&config_data).expect("Unable to parse");
+        layouts_data.layouts[&config.layout]
     }
 
     pub fn pushed(&self, client: &mut SyncClient) -> Result<ButtonState, Box<dyn Error>> {
