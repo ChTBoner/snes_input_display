@@ -85,27 +85,20 @@ Please tell me games that also work so I can add them to the list or if you figu
 The controller config file must be in the json format
 ```json
 {
-    // Address in hexadecimal to watch
-    // should be F5XXXX - F90718 is an address that works with many games on FxPakPro/SD2SNES
-    "address": "F90718",
-    // size in bytes of the input data
-    "size": 2,
-    // location of each button in the array of bits provided by usb2snes. Little Endian
-    "button_layout": 
-        {
-            "a": 0,
-            "x": 1,
-            "b": 8,
-            "y": 9,
-            "select": 10,
-            "start": 11,
-            "up": 12,
-            "down": 13,
-            "left": 14,
-            "right": 15,
-            "l": 2,
-            "r": 3
+    "layouts": {
+        "Default": {
+            "address_low": "F90718",
+            "address_high": "F90719"
+        },
+        "Super Mario World": {
+            "address_low": "F50DA4",
+            "address_high": "F50DA2"
+        },
+        "Ninja Gaiden Trilogy": {
+            "address_low": "F5127A",
+            "address_high": "F5127B"
         }
+    }
 }
 ```
 
