@@ -15,6 +15,8 @@ image.png
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
 - Sd2Snes or FxPak Pro for original hardware
 
+NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), but not with the Default layout.
+
 ## Configuration
 Requires a configuration file named "settings.toml" at this location:
 - Windows: %localappdata%\snes-input-display\
@@ -47,7 +49,8 @@ $ chmod +x snes_input_display_mac_amd64
 ```
 
 ## Game List Working with Defaults.json
-You should try with Defaults.json
+You should try with Defaults.json if you're on the Sd2Snes/FxPakPro, and will not work with an emulator
+The F90718 address doesn't work on emulator.
 
 If not working, you can try to figure it out with an Emulator like Bizhawk
 
@@ -77,39 +80,37 @@ If not working, you can try to figure it out with an Emulator like Bizhawk
 - The Legend of Zelda: A Link to the Past
 - The Lion King
 - SMZ3 Randomizers
+- ...
 
 This list is in no way complete.
 Please tell me games that also work so I can add them to the list or if you figure out other layouts
 
+Will not work with Super FX and SA-1 games. (Star Fox, Yoshi's Island...).
+
 ### Controller config file
+
 The controller config file must be in the json format
+
 ```json
 {
-    // Address in hexadecimal to watch
-    // should be F5XXXX - F90718 is an address that works with many games on FxPakPro/SD2SNES
-    "address": "F90718",
-    // size in bytes of the input data
-    "size": 2,
-    // location of each button in the array of bits provided by usb2snes. Little Endian
-    "button_layout": 
-        {
-            "a": 0,
-            "x": 1,
-            "b": 8,
-            "y": 9,
-            "select": 10,
-            "start": 11,
-            "up": 12,
-            "down": 13,
-            "left": 14,
-            "right": 15,
-            "l": 2,
-            "r": 3
+    "layouts": {
+        "Default": {
+            "address_low": "F90718",
+            "address_high": "F90719"
+        },
+        "Super Mario World": {
+            "address_low": "F50DA4",
+            "address_high": "F50DA2"
+        },
+        "Ninja Gaiden Trilogy": {
+            "address_low": "F5127A",
+            "address_high": "F5127B"
         }
+    }
 }
 ```
 
-Will not work with Super FX and SA-1 games
+You can add addresses to the file for your game if needed.
 
 ## TROUBLESHOOTING
 SNI or QUSB2SNES must be up and running and connected to a powered on console.
