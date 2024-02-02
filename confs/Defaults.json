@@ -19,6 +19,10 @@
         "Demon's Crest/Demon's Blazon": {
             "address_low": "F50090",
             "address_high": "F50093"
+        },
+        "Super Metroid Emu": {
+            "address_low": "F5008B",
+            "address_high": "F5008C"
         }
     }
 }
