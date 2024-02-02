@@ -81,7 +81,6 @@ impl event::EventHandler for InputViewer {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
         match self.state {
             AppState::Menu => {
@@ -102,7 +101,6 @@ impl event::EventHandler for InputViewer {
             }
         }
         canvas.finish(ctx)
-        
     }
 }
 
