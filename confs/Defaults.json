@@ -11,6 +11,18 @@
         "Ninja Gaiden Trilogy": {
             "address_low": "F5127A",
             "address_high": "F5127B"
+        },
+        "A Link To The Past": {
+            "address_low": "F500F2",
+            "address_high": "F500F0"
+        },
+        "Demon's Crest/Demon's Blazon": {
+            "address_low": "F50090",
+            "address_high": "F50093"
+        },
+        "Super Metroid Emu": {
+            "address_low": "F5008B",
+            "address_high": "F5008C"
         }
     }
 }
