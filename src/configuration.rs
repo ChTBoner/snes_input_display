@@ -1,7 +1,7 @@
 // use config::{Config, ConfigError};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::fs::{write, read_to_string, File};
+use std::fs::{read_to_string, write, File};
 use std::path::{Path, PathBuf};
 
 #[derive(Deserialize, Serialize, Debug)]
