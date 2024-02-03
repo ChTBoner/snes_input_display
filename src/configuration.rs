@@ -1,7 +1,7 @@
-use config::{Config, ConfigError};
+// use config::{Config, ConfigError};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::fs::{write, File};
+use std::fs::{write, read_to_string, File};
 use std::path::{Path, PathBuf};
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -24,7 +24,7 @@ pub struct AppConfig {
 }
 
 impl AppConfig {
-    pub fn new() -> Result<Self, ConfigError> {
+    pub fn new() -> Result<Self, Box<dyn Error>> {
         let config_file_path = dirs::config_local_dir()
             .unwrap()
             .join("snes-input-display")
@@ -32,13 +32,12 @@ impl AppConfig {
         let config_file_path = config_file_path.to_str().unwrap();
         dbg!(config_file_path);
         if !Path::new(&config_file_path).exists() {
-            Self::create_default(config_file_path).unwrap();
+            Self::create_default(config_file_path)?;
         }
-        let s = Config::builder()
-            .add_source(config::File::with_name(config_file_path))
-            .build()?;
-
-        s.try_deserialize()
+        // let mut file = File::open(config_file_path)?;
+        let contents = read_to_string(config_file_path)?;
+        let config: AppConfig = toml::from_str(&contents)?;
+        Ok(config)
     }
 
     fn create_default(path: &str) -> Result<(), Box<dyn Error>> {
