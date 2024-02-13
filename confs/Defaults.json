@@ -23,6 +23,10 @@
         "Super Metroid Emu": {
             "address_low": "F5008B",
             "address_high": "F5008C"
+        },
+        "Mega Man X": {
+            "address_low": "F500AB",
+            "address_high": "F500AA"
         }
     }
 }
