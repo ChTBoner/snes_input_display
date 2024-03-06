@@ -41,4 +41,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
-          path:  ${{ github.workspace }}/snes_input_display/snes_input_display/target/release/snes_input_display
+          path:  ${{ github.workspace }}/target/release/snes_input_display
