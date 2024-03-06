@@ -34,14 +34,14 @@ jobs:
       - name: Run cargo build --release
         run: cargo build --release
         
-      - uses: actions/upload-artifact@v4
-        if: ${{ runner.os != 'Windows' }}
-        with:
-          name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
-          path:  ${{ github.workspace }}/target/release/snes_input_display
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ runner.os != 'Windows' }}
+      #   with:
+      #     name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
+      #     path:  ${{ github.workspace }}/target/release/snes_input_display
       
-      - uses: actions/upload-artifact@v4
-        if: ${{ runner.os == 'Windows' }}
-        with:
-          name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
-          path:  ${{ github.workspace }}\target\release\snes_input_display.exe
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ runner.os == 'Windows' }}
+      #   with:
+      #     name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
+      #     path:  ${{ github.workspace }}\target\release\snes_input_display.exe

@@ -13,14 +13,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: ${{ env.GITHUB_TOKEN }}
-            asset_name: ${{ env.GITHUB_TOKEN }}-linux-amd64
+            artifact_name: ${BIN_NAME}
+            asset_name: ${BIN_NAME}-linux-amd64
           - os: windows-latest
-            artifact_name: ${{ env.GITHUB_TOKEN }}.exe
-            asset_name: ${{ env.GITHUB_TOKEN }}-windows-amd64
+            artifact_name: ${BIN_NAME}.exe
+            asset_name: ${BIN_NAME}-windows-amd64
           - os: macos-latest
-            artifact_name: ${{ env.GITHUB_TOKEN }}
-            asset_name: ${{ env.GITHUB_TOKEN }}-macos-amd64
+            artifact_name: ${BIN_NAME}
+            asset_name: ${BIN_NAME}-macos-amd64
     runs-on: ${{ matrix.os }}
     steps:
 
