@@ -1,33 +1,53 @@
-on: release
+on: 
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  CARGO_TERM_COLOR: always
+  BIN_NAME: snes_input_display
 
 jobs:
-    build:
-      strategy:
-        matrix:
-          os: [windows-latest, ubuntu-latest, macos-latest]
-          toolchain: [stable, beta]
-      runs-on: ${{ matrix.os }}
-      steps:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: ${{ env.GITHUB_TOKEN }}
+            asset_name: ${{ env.GITHUB_TOKEN }}-linux-amd64
+          - os: windows-latest
+            artifact_name: ${{ env.GITHUB_TOKEN }}.exe
+            asset_name: ${{ env.GITHUB_TOKEN }}-windows-amd64
+          - os: macos-latest
+            artifact_name: ${{ env.GITHUB_TOKEN }}
+            asset_name: ${{ env.GITHUB_TOKEN }}-macos-amd64
+    runs-on: ${{ matrix.os }}
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get Rust toolchain
+      uses: moonrepo/setup-rust@v1
+      with:
+        profile: minimal
+
+    - name: Install alsa and udev
+      if: ${{ runner.os == 'Linux' }}
+      run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
   
-      - name: Checkout
-        uses: actions/checkout@v2
-  
-      - name: Get Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.toolchain }}
-          override: true
-  
-      - name: Install alsa
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev
-  
-      - name: Install udev
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev
-  
-      - name: Run cargo check --all-targets w/ -D warnings
-        run: cargo check --all-targets
-        env:
-          RUSTFLAGS: "-D warnings"
+    - name: Run cargo check --all-targets w/ -D warnings
+      run: cargo check --all-targets
+      env:
+        RUSTFLAGS: "-D warnings"
+
+    - name: Run cargo build --release
+      run: cargo build --release
+      
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ github.workspace }}/target/release/${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
+        tag: ${{ github.ref }}

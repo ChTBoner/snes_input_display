@@ -1,5 +1,5 @@
 on:
-    workflow_call:
+  workflow_call:
 
 env:
     CARGO_TERM_COLOR: always
@@ -13,27 +13,29 @@ jobs:
       runs-on: ${{ matrix.os }}
       steps:
   
-      - name: Checkout
-        uses: actions/checkout@v2
-  
-      - name: Get Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.toolchain }}
-          override: true
-  
-      - name: Install alsa
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev
-  
-      - name: Install udev
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev
-  
-      - name: Run cargo check --all-targets w/ -D warnings
-        run: cargo check --all-targets
-        env:
-          RUSTFLAGS: "-D warnings"
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        # - run: echo ${{ github.workspace }}
+    
+        - name: Get Rust toolchain
+          uses: moonrepo/setup-rust@v1
+          with:
+            profile: minimal
+    
+        - name: Install alsa
+          if: ${{ runner.os == 'Linux' }}
+          run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev
+    
+        - name: Install udev
+          if: ${{ runner.os == 'Linux' }}
+          run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev
+    
+        - name: Run cargo check --all-targets w/ -D warnings
+          run: cargo check --all-targets
+          env:
+            RUSTFLAGS: "-D warnings"
         
+        - name: Run cargo build --release
+          run: cargo build --release
   
