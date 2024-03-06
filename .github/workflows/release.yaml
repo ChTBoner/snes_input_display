@@ -16,7 +16,7 @@ jobs:
             asset_name: snes_input_display-linux-amd64
           - os: windows-latest
             artifact_name: snes_input_display.exe
-            asset_name: snes_input_display-windows-amd64
+            asset_name: snes_input_display-windows-amd64.exe
           - os: macos-latest
             artifact_name: snes_input_display
             asset_name: snes_input_display-macos-amd64
