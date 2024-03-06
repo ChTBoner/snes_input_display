@@ -22,14 +22,10 @@ jobs:
         with:
           profile: minimal
 
-      - name: Install alsa
+      - name: Install alsa and udev
         if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev
-  
-      - name: Install udev
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev
-  
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+    
       # - name: Run cargo check --all-targets w/ -D warnings
       #   run: cargo check --all-targets
       #   env:
@@ -39,6 +35,13 @@ jobs:
         run: cargo build --release
         
       - uses: actions/upload-artifact@v4
+        if: ${{ runner.os != 'Windows' }}
         with:
           name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
           path:  ${{ github.workspace }}/target/release/snes_input_display
+      
+      - uses: actions/upload-artifact@v4
+        if: ${{ runner.os == 'Windows' }}
+        with:
+          name: snes-input-display-${{ github.ref_name }}-${{ runner.os }}
+          path:  ${{ github.workspace }}\target\release\snes_input_display
