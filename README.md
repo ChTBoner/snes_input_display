@@ -5,9 +5,6 @@ Displays your SNES input reading directly from the console data, built in Rust w
 
 Completely compatible with the [RetroSpy](https://retro-spy.com) Skin format for Super Nintendo controllers.
 
-
-
-
 ## Requirements
 ### Software
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
@@ -37,7 +34,7 @@ It will not work until all is correct in the configuration file.
 Paths must be in between single quotes
 ```toml
 [controller]
-# input_config_path: Path to read for input memory addresses
+# input_config_path: Path to read for input memory addresses (you can copy paste the contents of )
 input_config_path = 'D:\Documents\snes-input-display\inputs_addresses.json'
 layout = "Default"
 
@@ -52,7 +49,7 @@ skin_name = "snes-super-famicom-squabbler"
 skin_theme = "Black"
 
 ```
-A settings file example can be found [here](https://github.com/ChTBoner/snes_input_display)
+A settings file example can be found [here](./confs/settings.toml)
 
 ### For Linux and MacOS
 
@@ -131,6 +128,7 @@ The controller config file must be in the json format
 You can add addresses to the file for your game if needed.
 The RAM Search tools of Bizhawk are great to find the values.
 
+An example file can be found [here](./confs/Defaults.json)
 ## TROUBLESHOOTING
 SNI or QUSB2SNES must be up and running and connected to a powered on console.
 
