@@ -17,8 +17,12 @@ use configuration::AppConfig;
 
 const APP_NAME: &str = "Snes Input Display";
 
+// enum AppState {
+//     // Menu,
+//     InputViewer,
+// }
+
 struct InputViewer {
-    // config: AppConfig,
     controller: Controller,
     skin: Skin,
     client: SyncClient,
@@ -27,7 +31,6 @@ struct InputViewer {
 
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
-        dbg!(&config.controller.input_config_path);
         let controller = Controller::new(&config.controller);
 
         let skin = Skin::new(
@@ -56,7 +59,6 @@ impl InputViewer {
         })?;
 
         Ok(Self {
-            // config,
             controller,
             skin,
             client,
@@ -75,8 +77,6 @@ impl event::EventHandler for InputViewer {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
-
-        // Draw background
         canvas.draw(&self.skin.background.image, DrawParam::new());
 
         // Draw inputs
@@ -87,7 +87,6 @@ impl event::EventHandler for InputViewer {
                 DrawParam::default().dest(self.skin.buttons[event].rect.point()),
             );
         });
-
         canvas.finish(ctx)
     }
 }

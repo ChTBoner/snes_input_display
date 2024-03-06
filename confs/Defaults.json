@@ -25,8 +25,12 @@
             "address_high": "F5008C"
         },
         "Mega Man X": {
-            "address_low": "F500AB",
-            "address_high": "F500AA"
+            "address_low": "F500A7",
+            "address_high": "F500A8"
+        },
+        "Mega Man X2": {
+            "address_low": "F500A8",
+            "address_high": "F500A9"
         }
     }
 }

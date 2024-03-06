@@ -14,7 +14,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tungstenite = "0.21"
 quick-xml = { version = "0.31", features = ["overlapped-lists", "serialize"] }
-config = "0.14"
 dirs = "5"
 ggez = "0.9"
 rusb2snes = "0.1"
+toml = "0.8"

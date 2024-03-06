@@ -1,6 +1,6 @@
 use serde::{Deserialize, Deserializer};
 use std::error::Error;
-use std::{fs, collections::HashMap};
+use std::{collections::HashMap, fs};
 
 use crate::configuration::ControllerConfig;
 
@@ -107,7 +107,7 @@ impl Iterator for ButtonsIter {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct ControllerLayouts {
-    pub layouts: HashMap<String, Controller>
+    pub layouts: HashMap<String, Controller>,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy)]
@@ -120,8 +120,10 @@ pub struct Controller {
 
 impl Controller {
     pub fn new(config: &ControllerConfig) -> Self {
-        let config_data = fs::read_to_string(&config.input_config_path).expect("Unable open to config file");
-        let layouts_data: ControllerLayouts = serde_json::from_str(&config_data).expect("Unable to parse");
+        let config_data =
+            fs::read_to_string(&config.input_config_path).expect("Unable open to config file");
+        let layouts_data: ControllerLayouts =
+            serde_json::from_str(&config_data).expect("Unable to parse");
         layouts_data.layouts[&config.layout]
     }
 
