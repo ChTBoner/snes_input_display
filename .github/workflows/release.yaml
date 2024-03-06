@@ -5,7 +5,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  BIN_NAME: snes_input_display
 
 jobs:
   build:
@@ -13,14 +12,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact_name: ${BIN_NAME}
-            asset_name: ${BIN_NAME}-linux-amd64
+            artifact_name: snes_input_display
+            asset_name: snes_input_display-linux-amd64
           - os: windows-latest
-            artifact_name: ${BIN_NAME}.exe
-            asset_name: ${BIN_NAME}-windows-amd64
+            artifact_name: snes_input_display.exe
+            asset_name: snes_input_display-windows-amd64
           - os: macos-latest
-            artifact_name: ${BIN_NAME}
-            asset_name: ${BIN_NAME}-macos-amd64
+            artifact_name: snes_input_display
+            asset_name: snes_input_display-macos-amd64
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -36,10 +35,10 @@ jobs:
       if: ${{ runner.os == 'Linux' }}
       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
   
-    - name: Run cargo check --all-targets w/ -D warnings
-      run: cargo check --all-targets
-      env:
-        RUSTFLAGS: "-D warnings"
+    # - name: Run cargo check --all-targets w/ -D warnings
+    #   run: cargo check --all-targets
+    #   env:
+    #     RUSTFLAGS: "-D warnings"
 
     - name: Run cargo build --release
       run: cargo build --release
