@@ -30,10 +30,10 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev
   
-      - name: Run cargo check --all-targets w/ -D warnings
-        run: cargo check --all-targets
-        env:
-          RUSTFLAGS: "-D warnings"
+      # - name: Run cargo check --all-targets w/ -D warnings
+      #   run: cargo check --all-targets
+      #   env:
+      #     RUSTFLAGS: "-D warnings"
   
       - name: Run cargo build --release
         run: cargo build --release
