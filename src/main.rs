@@ -33,7 +33,6 @@ struct InputViewer {
 
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
-        dbg!(&config.controller.input_config_path);
         let controller = Controller::new(&config.controller);
 
         let skin = Skin::new(

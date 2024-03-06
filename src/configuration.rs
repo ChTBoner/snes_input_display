@@ -42,15 +42,17 @@ impl AppConfig {
 
     fn create_default(path: &str) -> Result<(), Box<dyn Error>> {
         println!("Creating a new settings file: {path}");
+        let default_dir = dirs::document_dir().unwrap().join("snes-input-display");
+        let default_inputs_file_path = default_dir.join("inputs_addresses.json");
+        let default_skins_dir_path =  default_dir.join("skins");
+
         let config = AppConfig {
             controller: ControllerConfig {
-                input_config_path: PathBuf::from(&path),
+                input_config_path: default_inputs_file_path,
                 layout: "Default".to_string(),
             },
             skin: SkinConfig {
-                skins_path: PathBuf::from(
-                    "C:\\Users\\example\\Documents\\retrospy-nintendospy-skins\\skins",
-                ),
+                skins_path: default_skins_dir_path,
                 skin_name: "skin_folder_name".to_string(),
                 skin_theme: "skin_theme".to_string(),
             },

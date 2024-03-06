@@ -1,30 +1,46 @@
 # Snes controller input display
-Displays your SNES input reading directly from the console data, built in Rust with ggez.
+![image info](images/snes_controller.png)
+
+Displays your SNES input reading directly from the console data, built in Rust with [ggez](https://ggez.rs).
 
 Completely compatible with the [RetroSpy](https://retro-spy.com) Skin format for Super Nintendo controllers.
 
-You can find great skins here: https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
-image.png
-
-
-![image info](images/snes_controller.png)
 
 
 
 ## Requirements
+### Software
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
 - Sd2Snes or FxPak Pro for original hardware
 
-NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), and [bsnes-plus](https://github.com/black-sliver/bsnes-plus.git) not with the Default layout.
+NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), and [bsnes-plus](https://github.com/black-sliver/bsnes-plus.git) but NOT with the Default layout.
+
+### Configuration File
+A configuration file named "settings.toml" at this location (see below for details):
+- Windows: %localappdata%\snes-input-display\
+- MacOS: $HOME/Library/Application Support/snes-input-display
+- Linux: $HOME/.config/snes-input-display
+
+### Skins
+Retrospy compatible skins. 
+
+You can find great skins here: 
+ - https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
+ - https://proximitysound.itch.io/skins
 
 ## Configuration
-Requires a configuration file named "settings.toml" at this location:
-- Windows: %localappdata%\snes-input-display\
-- MacOs: $HOME/Library/Application Support/snes-input-display
-- Linux: $HOME/.config/snes-input-display
+
+If no configuration file is found at startup, it will create a file with bogus values at the locations stated above, and exit. 
+
+It will not work until all is correct in the configuration file.
 
 Paths must be in between single quotes
 ```toml
+[controller]
+# input_config_path: Path to read for input memory addresses
+input_config_path = 'D:\Documents\snes-input-display\inputs_addresses.json'
+layout = "Default"
+
 [skin]
 # skins_path: Folder where all your Retrospy skins are stored
 # skins_path = '/home/example/Documents/squabbler-retrospy-nintendospy-skins/skins'
@@ -38,8 +54,10 @@ skin_theme = "Black"
 ```
 A settings file example can be found [here](https://github.com/ChTBoner/snes_input_display)
 
-## For Linux and MacOS
+### For Linux and MacOS
+
 Dont forget to set the correct permission on the file to allow it to execute
+
 ```sh
 $ cd /path/to/snes_input_viewer/folder
 # Linux
@@ -48,8 +66,8 @@ $ chmod +x snes_input_display_linux_amd64
 $ chmod +x snes_input_display_mac_amd64
 ```
 
-## Game List Working with Defaults.json
-You should try with Defaults.json if you're on the Sd2Snes/FxPakPro, and will not work with an emulator
+## Game List Working with the Defaults layout
+You should try with the Default Layout if you're on the Sd2Snes/FxPakPro. It will NOT work with an emulator
 The F90718 address doesn't work on emulator.
 
 If not working, you can try to figure it out with an Emulator like Bizhawk
@@ -111,9 +129,12 @@ The controller config file must be in the json format
 ```
 
 You can add addresses to the file for your game if needed.
+The RAM Search tools of Bizhawk are great to find the values.
 
 ## TROUBLESHOOTING
 SNI or QUSB2SNES must be up and running and connected to a powered on console.
+
+Make sure all paths and info are correct in the configuration file.
 
 ## Credits
 [Skarsnik](https://github.com/Skarsnik)
