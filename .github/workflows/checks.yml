@@ -33,10 +33,10 @@ jobs:
         env:
           RUSTFLAGS: "-D warnings"
   
-      - name: Run cargo test w/ -D warnings
+      - name: Run cargo build --release
         run: cargo build --release
         
       - uses: actions/upload-artifact@v4
         with:
           name: snes-input-viewer-${{ github.ref_name }}-${{ runner.os }}
-          path: /home/runner/work/snes_input_display/snes_input_display
+          path: snes_input_display/snes_input_display
