@@ -49,8 +49,12 @@ impl InputViewer {
         client.set_name(String::from(APP_NAME))?;
 
         let devices = client.list_device()?;
-
         client.attach(&devices[0])?;
+        let game_name = client.get_address(0x7FC0, 16)?;
+        for i in game_name {
+            let num = format!("{}", char::from_u32(i as u32).unwrap());
+            println!("{}", num);
+        }
         let _info = client.info()?;
 
         // Set the window size
