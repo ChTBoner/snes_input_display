@@ -36,7 +36,7 @@ impl InputViewer {
         let skin = Skin::new(
             &config.skin.skins_path,
             &config.skin.skin_name,
-            &config.skin.skin_theme,
+            &config.skin.skin_theme.to_lowercase(),
             ctx,
         )?;
 
