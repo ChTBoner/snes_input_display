@@ -3,7 +3,7 @@ mod configuration;
 mod controller;
 mod skins;
 use controller::{ButtonState, Controller};
-
+use ggegui::{egui, Gui};
 use ggez::{
     conf, event, graphics::{self, DrawParam}, timer::sleep, Context, ContextBuilder, GameResult
 };
@@ -25,6 +25,7 @@ struct InputViewer {
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
+    gui: Gui
 }
 
 impl InputViewer {
@@ -64,7 +65,7 @@ impl InputViewer {
         loop {
             match client.list_device() {
                 Ok(l) => {
-                    if l.len() > 0 { 
+                    if !l.is_empty() { 
                         devices = l;
                         break;
                     }
@@ -92,15 +93,17 @@ impl InputViewer {
             skin,
             client,
             events: ButtonState::default(),
+            gui: Gui::new(ctx)
         })
     }
 }
 
 impl event::EventHandler for InputViewer {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
         // Update code here...
         // const DESIRED_FPS: u32 = 60;
         self.events = self.controller.pushed(&mut self.client).unwrap();
+        self.gui.update(ctx);
         Ok(())
     }
 
@@ -116,6 +119,7 @@ impl event::EventHandler for InputViewer {
                 DrawParam::default().dest(self.skin.buttons[event].rect.point()),
             );
         });
+        canvas.draw(&self.gui, DrawParam::default());
         canvas.finish(ctx)
     }
 }
@@ -123,12 +127,12 @@ impl event::EventHandler for InputViewer {
 fn main() -> Result<GameResult, Box<dyn Error>> {
     /* Setup Configs */
     let app_config = AppConfig::new()?;
-
+    
     let (mut ctx, event_loop) = ContextBuilder::new(APP_NAME, "ChTBoner")
-        .add_resource_path(&app_config.skin.skins_path)
-        .window_setup(conf::WindowSetup::default().title(APP_NAME))
-        .build()
-        .expect("aieee, could not create ggez context!");
+    .add_resource_path(&app_config.skin.skins_path)
+    .window_setup(conf::WindowSetup::default().title(APP_NAME))
+    .build()
+    .expect("aieee, could not create ggez context!");
 
     let input_viewer = InputViewer::new(&mut ctx, app_config)?;
     event::run(ctx, event_loop, input_viewer);
