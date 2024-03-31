@@ -102,6 +102,8 @@ Please tell me games that also work so I can add them to the list or if you figu
 
 Will not work with Super FX and SA-1 games. (Star Fox, Yoshi's Island...).
 
+Super Metroid Hacks: if no inputs are showing on the display with the Default layout, try with the "Super Metroid Emu" layout
+
 ### Controller config file
 
 The controller config file must be in the json format
@@ -133,6 +135,7 @@ An example file can be found [here](./confs/Defaults.json)
 SNI or QUSB2SNES must be up and running and connected to a powered on console.
 
 Make sure all paths and info are correct in the configuration file.
+
 
 ## Credits
 [Skarsnik](https://github.com/Skarsnik)
