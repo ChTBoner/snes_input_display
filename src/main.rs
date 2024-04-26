@@ -15,6 +15,7 @@ use skins::Skin;
 use std::{error::Error, time};
 
 use configuration::AppConfig;
+use height
 
 const APP_NAME: &str = "Snes Input Display";
 
@@ -26,6 +27,7 @@ const APP_NAME: &str = "Snes Input Display";
 struct InputViewer {
     controller: Controller,
     skin: Skin,
+    available_skins: HashMap<String, Skin>,
     client: SyncClient,
     events: ButtonState,
 }
@@ -34,12 +36,8 @@ impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
-        let skin = Skin::new(
-            &config.skin.skins_path,
-            &config.skin.skin_name,
-            &config.skin.skin_theme.to_lowercase(),
-            ctx,
-        )?;
+        let skins = Skin::available_skins(&config.skin, ctx)?;
+        let skin = skins.get(&config.skin.skin_name);
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
@@ -91,6 +89,7 @@ impl InputViewer {
         Ok(Self {
             controller,
             skin,
+            available_skins,
             client,
             events: ButtonState::default(),
         })

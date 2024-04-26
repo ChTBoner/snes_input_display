@@ -15,6 +15,7 @@ use std::{
     path::PathBuf,
 };
 
+use crate::configuration::SkinConfig;
 use crate::controller::Pressed;
 
 type LayoutResult = Result<(Vec<Theme>, BTreeMap<Pressed, Button>), Box<dyn Error>>;
@@ -30,26 +31,39 @@ pub struct Skin {
 }
 
 impl Skin {
-    pub fn new(
-        path: &Path,
-        name: &String,
-        theme: &String,
-        ctx: &mut Context,
-    ) -> Result<Skin, Box<dyn Error>> {
-        let skin_filename = "skin.xml";
-        let file_path = path.join(name).join(skin_filename);
-        let directory = file_path.parent().unwrap().to_owned();
+    // pub fn new(config: &SkinConfig, ctx: &mut Context) -> Result<(Skin, HashMap<String, Skin), Box<dyn Error>> {
+    //     // let directory = file_path.parent().unwrap().to_owned();
+    //     let skins = Skin::available_skins(&config.skins_path)?;
+    //     Ok(skins.get(&config.skin_name), skins);
+    // }
 
-        let (backgrounds, buttons) = get_layout(file_path, name, ctx)?;
-        let background = parse_backgrounds(backgrounds, theme).unwrap();
-        Ok(Self {
-            // metadata,
-            background,
-            buttons: buttons_map_to_array(buttons),
-            directory,
-            name: name.to_owned(),
-            theme: theme.to_owned(),
-        })
+    pub fn available_skins(
+        config: &SkinConfig,
+        ctx: &mut Context,
+    ) -> Result<HashMap<String, Skin>, Box<dyn Error>> {
+        let mut skins: HashMap<String, Skin> = HashMap::new();
+        let skin_filename = "skin.xml";
+
+        for skin in fs::read_dir(config.skins_path)? {
+            let skin = skin?;
+            let skin_name = skin.file_name();
+            let skin_dir_path = skin.path();
+            let skin_file_path = skin_dir_path.join(skin_filename);
+            let (backgrounds, buttons) = get_layout(skin_file_path, &skin_name, ctx)?;
+            let background = parse_backgrounds(backgrounds, &config.skin_theme).unwrap();
+            skins.insert(
+                skin_name.to_string_lossy(),
+                Skin {
+                    // metadata,
+                    background,
+                    buttons: buttons_map_to_array(buttons),
+                    directory: skin_dir_path,
+                    name: skin_name.to_string_lossy(),
+                    theme: theme.to_owned(),
+                },
+            );
+        }
+        Ok(skins)
     }
 }
 
