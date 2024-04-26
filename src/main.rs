@@ -121,6 +121,24 @@ impl event::EventHandler for InputViewer {
         });
         canvas.finish(ctx)
     }
+
+    fn key_down_event(
+        &mut self,
+        ctx: &mut Context,
+        input: KeyInput,
+        _repeated: bool,
+    ) -> Result<(), ggez::GameError> {
+        match input.keycode {
+            Some(KeyCode::S) => {
+                println!("Change Skin!");
+            }
+            Some(KeyCode::L) => {
+                println!("Change Layout required!");
+            }
+            _ => (),
+        }
+        Ok(())
+    }
 }
 
 fn main() -> Result<GameResult, Box<dyn Error>> {
