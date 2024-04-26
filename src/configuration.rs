@@ -1,7 +1,7 @@
 // use config::{Config, ConfigError};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::fs::{read_to_string, write, File};
+use std::fs::{self, read_to_string, write, File};
 use std::path::{Path, PathBuf};
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -25,13 +25,12 @@ pub struct AppConfig {
 
 impl AppConfig {
     pub fn new() -> Result<Self, Box<dyn Error>> {
-        let config_file_path = dirs::config_local_dir()
-            .unwrap()
-            .join("snes-input-display")
-            .join("settings.toml");
+        let config_dir_path = dirs::config_local_dir().unwrap().join("snes-input-display");
+        let config_file_path = config_dir_path.join("settings.toml");
         let config_file_path = config_file_path.to_str().unwrap();
         dbg!(config_file_path);
         if !Path::new(&config_file_path).exists() {
+            fs::create_dir_all(config_dir_path)?;
             Self::create_default(config_file_path)?;
         }
         // let mut file = File::open(config_file_path)?;
@@ -42,9 +41,13 @@ impl AppConfig {
 
     fn create_default(path: &str) -> Result<(), Box<dyn Error>> {
         println!("Creating a new settings file: {path}");
-        let default_dir = dirs::document_dir().unwrap().join("snes-input-display");
+        let default_dir = dirs::home_dir()
+            .unwrap()
+            .join("Documents")
+            .join("snes-input-display");
         let default_inputs_file_path = default_dir.join("inputs_addresses.json");
-        let default_skins_dir_path =  default_dir.join("skins");
+        let default_skins_dir_path = default_dir.join("skins");
+        fs::create_dir_all(&default_skins_dir_path)?;
 
         let config = AppConfig {
             controller: ControllerConfig {
