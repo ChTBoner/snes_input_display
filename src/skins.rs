@@ -46,20 +46,20 @@ impl Skin {
 
         for skin in fs::read_dir(config.skins_path)? {
             let skin = skin?;
-            let skin_name = skin.file_name();
+            let skin_name = skin.file_name().to_string_lossy().to_string();
             let skin_dir_path = skin.path();
             let skin_file_path = skin_dir_path.join(skin_filename);
             let (backgrounds, buttons) = get_layout(skin_file_path, &skin_name, ctx)?;
             let background = parse_backgrounds(backgrounds, &config.skin_theme).unwrap();
             skins.insert(
-                skin_name.to_string_lossy(),
+                skin_name,
                 Skin {
                     // metadata,
                     background,
                     buttons: buttons_map_to_array(buttons),
                     directory: skin_dir_path,
-                    name: skin_name.to_string_lossy(),
-                    theme: theme.to_owned(),
+                    name: skin_name,
+                    theme: config.skin_theme,
                 },
             );
         }

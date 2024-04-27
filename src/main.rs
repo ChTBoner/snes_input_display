@@ -12,10 +12,10 @@ use ggez::{
 };
 use rusb2snes::SyncClient;
 use skins::Skin;
+use std::collections::HashMap;
 use std::{error::Error, time};
 
 use configuration::AppConfig;
-use height
 
 const APP_NAME: &str = "Snes Input Display";
 
@@ -24,9 +24,9 @@ const APP_NAME: &str = "Snes Input Display";
 //     InputViewer,
 // }
 
-struct InputViewer {
+struct InputViewer<'a> {
     controller: Controller,
-    skin: Skin,
+    skin: &Skin,
     available_skins: HashMap<String, Skin>,
     client: SyncClient,
     events: ButtonState,
@@ -36,8 +36,8 @@ impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
-        let skins = Skin::available_skins(&config.skin, ctx)?;
-        let skin = skins.get(&config.skin.skin_name);
+        let available_skins = Skin::available_skins(&config.skin, ctx)?;
+        let skin = available_skins.get(&config.skin.skin_name).unwrap();
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
