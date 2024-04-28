@@ -23,11 +23,11 @@ type LayoutResult = Result<(Vec<Theme>, BTreeMap<Pressed, Button>), Box<dyn Erro
 // #[derive(Debug)]
 pub struct Skin {
     // pub metadata: HashMap<String, String>,
-    pub background: Theme,
+    pub backgrounds: Vec<Theme>,
     pub buttons: Box<ButtonsMap>,
     pub directory: PathBuf,
-    pub name: String,
-    pub theme: String,
+    // pub name: String,
+    // pub theme: String,
 }
 
 impl Skin {
@@ -44,22 +44,21 @@ impl Skin {
         let mut skins: HashMap<String, Skin> = HashMap::new();
         let skin_filename = "skin.xml";
 
-        for skin in fs::read_dir(config.skins_path)? {
+        for skin in fs::read_dir(&config.skins_path)? {
             let skin = skin?;
             let skin_name = skin.file_name().to_string_lossy().to_string();
             let skin_dir_path = skin.path();
             let skin_file_path = skin_dir_path.join(skin_filename);
             let (backgrounds, buttons) = get_layout(skin_file_path, &skin_name, ctx)?;
-            let background = parse_backgrounds(backgrounds, &config.skin_theme).unwrap();
             skins.insert(
                 skin_name,
                 Skin {
                     // metadata,
-                    background,
+                    backgrounds,
                     buttons: buttons_map_to_array(buttons),
                     directory: skin_dir_path,
-                    name: skin_name,
-                    theme: config.skin_theme,
+                    // name: skin_name,
+                    // theme: c,
                 },
             );
         }

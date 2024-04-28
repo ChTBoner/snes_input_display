@@ -26,18 +26,18 @@ const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer<'a> {
     controller: Controller,
-    skin: &Skin,
+    skin: &'a Skin,
     available_skins: HashMap<String, Skin>,
     client: SyncClient,
     events: ButtonState,
 }
 
-impl InputViewer {
+impl<'a> InputViewer<'a> {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
         let available_skins = Skin::available_skins(&config.skin, ctx)?;
-        let skin = available_skins.get(&config.skin.skin_name).unwrap();
+        let skin = &available_skins.get(&config.skin.skin_name).unwrap();
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
@@ -82,7 +82,7 @@ impl InputViewer {
         ctx.gfx.set_mode(conf::WindowMode {
             width: skin.background.image.width() as f32,
             height: skin.background.height,
-            resizable: true,
+            resizable: false,
             ..Default::default()
         })?;
 
@@ -96,7 +96,7 @@ impl InputViewer {
     }
 }
 
-impl event::EventHandler for InputViewer {
+impl<'a> event::EventHandler for InputViewer<'a> {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
         // Update code here...
         // const DESIRED_FPS: u32 = 60;
