@@ -11,8 +11,8 @@ use ggez::{
     Context, ContextBuilder, GameResult,
 };
 use rusb2snes::SyncClient;
-use skins::Skin;
-use std::{error::Error, time};
+use skins::{Skin, Theme};
+use std::{collections::HashMap, error::Error, time};
 
 use configuration::AppConfig;
 
@@ -25,16 +25,20 @@ const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
     controller: Controller,
+    available_skins: HashMap<String, Skin>,
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
+    config: AppConfig,
+    theme: Theme
 }
 
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
-        let skin = Skin::new(&config.skin, ctx)?;
+        let available_skins = Skin::list_available_skins(&config.skin.skins_path, ctx)?;
+        let skin = available_skins.get(&config.skin.skin_name).unwrap();
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
@@ -74,25 +78,33 @@ impl InputViewer {
         client.attach(&devices[0])?;
         let msg = format!("Attached to {}", &devices[0]);
         println!("{}", msg);
+        dbg!(&skin.themes);
+        let theme = skin.themes.get(&config.skin.skin_theme.to_lowercase()).unwrap();
+
+        let width = theme.width;
+        let height = theme.height;
 
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {
-            width: skin.background.image.width() as f32,
-            height: skin.background.height,
+            width,
+            height,
             resizable: true,
             ..Default::default()
         })?;
 
         Ok(Self {
+            available_skins: available_skins.clone(),
             controller,
-            skin,
+            skin: skin.clone(),
             client,
             events: ButtonState::default(),
+            config,
+            theme: theme.clone(),
         })
     }
 }
 
-impl event::EventHandler for InputViewer {
+impl<'a> event::EventHandler for InputViewer {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
         // Update code here...
         // const DESIRED_FPS: u32 = 60;
@@ -102,7 +114,12 @@ impl event::EventHandler for InputViewer {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
-        canvas.draw(&self.skin.background.image, DrawParam::new());
+        canvas.draw(
+            &self
+                .theme
+                .image,
+            DrawParam::new(),
+        );
 
         // Draw inputs
         self.events.iter().for_each(|event| {

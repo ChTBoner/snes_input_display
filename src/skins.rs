@@ -11,57 +11,106 @@ use quick_xml::{
 use std::{
     collections::{BTreeMap, HashMap},
     error::Error,
-    fmt, fs,
+    fmt,
+    fs,
     io::Read,
     path::{Path, PathBuf},
 };
+use walkdir::WalkDir;
+
+#[derive(Debug)]
+struct NotASnesSkin(String);
+
+impl fmt::Display for NotASnesSkin {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "There is an error: {}", self.0)
+    }
+}
+
+impl Error for NotASnesSkin {}
 
 type LayoutResult = Result<
     (
         HashMap<String, String>,
-        Vec<Theme>,
+        HashMap<String, Theme>,
         BTreeMap<Pressed, Button>,
     ),
     Box<dyn Error>,
 >;
-// type LayoutResult = Option<(Vec<Theme>, BTreeMap<Pressed, Button>)>;
+// type LayoutResult = Option<(HashMap<String, String>, HashMap<String, Theme>, BTreeMap<Pressed, Button>)>;
 
-// #[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Skin {
     pub metadata: HashMap<String, String>,
-    pub background: Theme,
+    // pub background: Theme,
     pub buttons: Box<ButtonsMap>,
     pub directory: PathBuf,
     pub name: String,
-    pub theme: String,
+    pub themes: HashMap<String, Theme>,
 }
 
 impl Skin {
-    pub fn new(config: &SkinConfig, ctx: &mut Context) -> Result<Skin, Box<dyn Error>> {
-        let skin_filename = "skin.xml";
-        let skin_directory = config.skins_path.join(&config.skin_name);
-        let skin_file_path = skin_directory.join(skin_filename);
-        dbg!(&skin_file_path);
-        let (metadata, backgrounds, buttons) =
-            parse_skinfile_layout(skin_file_path, &config.skin_name, ctx)?;
-        let background = parse_backgrounds(backgrounds, &config.skin_theme.to_lowercase()).unwrap();
+    pub fn new(path: &Path, name: &String, ctx: &mut Context) -> Result<Skin, Box<dyn Error>> {
+    // pub fn new(path: &Path, name: &String, ctx: &mut Context) -> Option<Skin> {
+        let (metadata, backgrounds, buttons) = parse_skinfile_layout(path, name, ctx)?;
+        // dbg!(&metadata);
+        // dbg!(&backgrounds);
+        // dbg!(&buttons);
+        // let background = parse_backgrounds(backgrounds, &config.skin_theme.to_lowercase()).unwrap();
+        if metadata.get("type").unwrap() != &"snes".to_string() {
+            return Err(Box::new(NotASnesSkin("Oops".into())));
+        }
         Ok(Self {
-            // metadata
             metadata,
-            background,
+            // background,
             buttons: buttons_map_to_array(buttons),
-            directory: skin_directory,
-            name: config.skin_name.to_owned(),
-            theme: config.skin_theme.to_owned(),
+            directory: path.parent().unwrap().to_path_buf(),
+            name: name.to_owned(),
+            themes: backgrounds,
         })
+    }
+
+    // pub fn default(config: &SkinConfig, ctx: &mut Context) -> Result<Skin, Box<dyn Error>> {
+    //     let skin_filename = "skin.xml";
+    //     let skin_directory = config.skins_path.join(&config.skin_name);
+    //     let skin_file_path = skin_directory.join(skin_filename);
+    //     Ok(Self::new(&skin_file_path, &config.skin_name, ctx)?)
+    // }
+
+    pub fn list_available_skins(
+        path: &PathBuf,
+        ctx: &mut Context,
+    ) -> Result<HashMap<String, Skin>, Box<dyn Error>> {
+        let mut available_skins: HashMap<String, Skin> = HashMap::new();
+        for entry in WalkDir::new(path).into_iter() {
+            let entry = entry?;
+            if entry.file_name() == "skin.xml" {
+                let skin_name = entry
+                    .path()
+                    .parent()
+                    .unwrap()
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string();
+                
+                match Skin::new(entry.path(), &skin_name, ctx) {
+                    Ok(s) => {
+                        available_skins.insert(skin_name, s);
+                    },
+                    Err(e) => println!("Not a Snes Skin: {e}"),
+                };
+            }
+        }
+        Ok(available_skins)
     }
 }
 
-fn parse_skinfile_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult {
+fn parse_skinfile_layout(file_path: &Path, name: &str, ctx: &mut Context) -> LayoutResult {
     let file = load_file(&file_path);
     let mut reader = Reader::from_str(&file);
     let mut metadata: HashMap<String, String> = HashMap::new();
-    let mut backgrounds: Vec<Theme> = Vec::new();
+    let mut backgrounds: HashMap<String, Theme> = HashMap::new();
     let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
 
     loop {
@@ -75,8 +124,8 @@ fn parse_skinfile_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> L
             // Ok(Event::Start(t)) => _metadata = parse_attributes(t),
             Ok(Event::Empty(t)) => match t.name().as_ref() {
                 b"background" => {
-                    let bg = Theme::new(t, name, ctx)?;
-                    backgrounds.push(bg);
+                    let (theme_name, theme_bg) = Theme::new(t, name, ctx)?;
+                    backgrounds.insert(theme_name, theme_bg);
                 }
                 b"button" => {
                     let bt = Button::new(t, name, ctx)?;
@@ -135,23 +184,27 @@ pub struct Theme {
 }
 
 impl Theme {
-    fn new(t: BytesStart, dir: &str, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
+    fn new(t: BytesStart, dir: &str, ctx: &mut Context) -> Result<(String, Self), Box<dyn Error>> {
         let attributes = parse_attributes(t);
         let image_path = Path::new("/").join(dir).join(&attributes["image"]);
         let image = Image::from_path(ctx, image_path)?;
         let width = image.width() as f32;
         let height = image.height() as f32;
+        let name = attributes["name"].to_owned().to_lowercase();
 
-        Ok(Self {
-            name: attributes["name"].to_owned().to_lowercase(),
-            image,
-            width,
-            height,
-        })
+        Ok((
+            name.to_owned(),
+            Self {
+                name,
+                image,
+                width,
+                height,
+            },
+        ))
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Button {
     pub name: Pressed,
     pub image: Image,
@@ -214,7 +267,7 @@ fn parse_attributes(t: BytesStart) -> HashMap<String, String> {
 
 /// A wrapper over an array `[Button; 12]` indexable by `Pressed`. The array is internally ordered
 /// by a button's bit ascending from lowest bit to highest.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ButtonsMap([Button; 12]);
 
 impl std::ops::Index<Pressed> for ButtonsMap {
