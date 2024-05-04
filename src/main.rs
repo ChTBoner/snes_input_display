@@ -5,7 +5,10 @@ mod skins;
 use controller::{ButtonState, Controller};
 
 use ggez::{
-    conf, event, graphics::{self, DrawParam}, timer::sleep, Context, ContextBuilder, GameResult
+    conf, event,
+    graphics::{self, DrawParam},
+    timer::sleep,
+    Context, ContextBuilder, GameResult,
 };
 use rusb2snes::SyncClient;
 use skins::Skin;
@@ -31,16 +34,11 @@ impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
-        let skin = Skin::new(
-            &config.skin.skins_path,
-            &config.skin.skin_name,
-            &config.skin.skin_theme.to_lowercase(),
-            ctx,
-        )?;
+        let skin = Skin::new(&config.skin, ctx)?;
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
-        
+
         // loop until connected to usb2snes
         loop {
             match SyncClient::connect() {
@@ -49,11 +47,11 @@ impl InputViewer {
                     let msg = format!("Connected to {}", &client.app_version()?);
                     println!("{}", msg);
                     break;
-                },
+                }
                 Err(_) => {
                     println!("Not connected to a usb2snes client");
                     sleep(time::Duration::from_secs(1));
-                }, 
+                }
             }
         }
 
@@ -64,20 +62,18 @@ impl InputViewer {
         loop {
             match client.list_device() {
                 Ok(l) => {
-                    if l.len() > 0 { 
+                    if !l.is_empty() {
                         devices = l;
                         break;
                     }
-                },
-                Err(_) => println!("Error listing devices")
+                }
+                Err(_) => println!("Error listing devices"),
             }
         }
 
         client.attach(&devices[0])?;
         let msg = format!("Attached to {}", &devices[0]);
         println!("{}", msg);
-
-
 
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {

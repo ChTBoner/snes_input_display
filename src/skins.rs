@@ -1,3 +1,5 @@
+use crate::configuration::SkinConfig;
+use crate::controller::Pressed;
 use ggez::{
     graphics::{Image, Rect},
     Context,
@@ -9,19 +11,24 @@ use quick_xml::{
 use std::{
     collections::{BTreeMap, HashMap},
     error::Error,
-    fs,
+    fmt, fs,
     io::Read,
-    path::Path,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
-use crate::controller::Pressed;
-
-type LayoutResult = Result<(Vec<Theme>, BTreeMap<Pressed, Button>), Box<dyn Error>>;
+type LayoutResult = Result<
+    (
+        HashMap<String, String>,
+        Vec<Theme>,
+        BTreeMap<Pressed, Button>,
+    ),
+    Box<dyn Error>,
+>;
+// type LayoutResult = Option<(Vec<Theme>, BTreeMap<Pressed, Button>)>;
 
 // #[derive(Debug)]
 pub struct Skin {
-    // pub metadata: HashMap<String, String>,
+    pub metadata: HashMap<String, String>,
     pub background: Theme,
     pub buttons: Box<ButtonsMap>,
     pub directory: PathBuf,
@@ -30,38 +37,41 @@ pub struct Skin {
 }
 
 impl Skin {
-    pub fn new(
-        path: &Path,
-        name: &String,
-        theme: &String,
-        ctx: &mut Context,
-    ) -> Result<Skin, Box<dyn Error>> {
+    pub fn new(config: &SkinConfig, ctx: &mut Context) -> Result<Skin, Box<dyn Error>> {
         let skin_filename = "skin.xml";
-        let file_path = path.join(name).join(skin_filename);
-        let directory = file_path.parent().unwrap().to_owned();
-
-        let (backgrounds, buttons) = get_layout(file_path, name, ctx)?;
-        let background = parse_backgrounds(backgrounds, theme).unwrap();
+        let skin_directory = config.skins_path.join(&config.skin_name);
+        let skin_file_path = skin_directory.join(skin_filename);
+        dbg!(&skin_file_path);
+        let (metadata, backgrounds, buttons) =
+            parse_skinfile_layout(skin_file_path, &config.skin_name, ctx)?;
+        let background = parse_backgrounds(backgrounds, &config.skin_theme.to_lowercase()).unwrap();
         Ok(Self {
-            // metadata,
+            // metadata
+            metadata,
             background,
             buttons: buttons_map_to_array(buttons),
-            directory,
-            name: name.to_owned(),
-            theme: theme.to_owned(),
+            directory: skin_directory,
+            name: config.skin_name.to_owned(),
+            theme: config.skin_theme.to_owned(),
         })
     }
 }
 
-fn get_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult {
+fn parse_skinfile_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult {
     let file = load_file(&file_path);
     let mut reader = Reader::from_str(&file);
-    let mut _metadata: HashMap<String, String> = HashMap::new();
+    let mut metadata: HashMap<String, String> = HashMap::new();
     let mut backgrounds: Vec<Theme> = Vec::new();
     let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
 
     loop {
         match reader.read_event() {
+            // check if it's a snes skin type
+            Ok(Event::Start(t)) => {
+                if t.name().as_ref() == b"skin" {
+                    metadata = parse_attributes(t)
+                }
+            }
             // Ok(Event::Start(t)) => _metadata = parse_attributes(t),
             Ok(Event::Empty(t)) => match t.name().as_ref() {
                 b"background" => {
@@ -79,7 +89,7 @@ fn get_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult
             _ => (),
         }
     }
-    Ok((backgrounds, buttons))
+    Ok((metadata, backgrounds, buttons))
 }
 
 fn load_file(path: &Path) -> String {
@@ -92,7 +102,7 @@ fn load_file(path: &Path) -> String {
 fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: &String) -> Option<Theme> {
     backgrounds_vec
         .into_iter()
-        .find(|background| background.theme.eq(theme))
+        .find(|background| background.name.eq(theme))
 }
 
 /// Produces an boxed array indexable by `Pressed` that maps a single button press to an
@@ -118,7 +128,7 @@ fn buttons_map_to_array(mut buttons_map: BTreeMap<Pressed, Button>) -> Box<Butto
 
 #[derive(Debug, Clone)]
 pub struct Theme {
-    pub theme: String,
+    pub name: String,
     pub image: Image,
     pub width: f32,
     pub height: f32,
@@ -133,7 +143,7 @@ impl Theme {
         let height = image.height() as f32;
 
         Ok(Self {
-            theme: attributes["name"].to_owned().to_lowercase(),
+            name: attributes["name"].to_owned().to_lowercase(),
             image,
             width,
             height,
