@@ -51,11 +51,7 @@ pub struct Skin {
 
 impl Skin {
     pub fn new(path: &Path, name: &String, ctx: &mut Context) -> Result<Skin, Box<dyn Error>> {
-    // pub fn new(path: &Path, name: &String, ctx: &mut Context) -> Option<Skin> {
         let (metadata, backgrounds, buttons) = parse_skinfile_layout(path, name, ctx)?;
-        // dbg!(&metadata);
-        // dbg!(&backgrounds);
-        // dbg!(&buttons);
         // let background = parse_backgrounds(backgrounds, &config.skin_theme.to_lowercase()).unwrap();
         if metadata.get("type").unwrap() != &"snes".to_string() {
             return Err(Box::new(NotASnesSkin("Oops".into())));

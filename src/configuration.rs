@@ -30,7 +30,7 @@ impl AppConfig {
             .join("snes-input-display")
             .join("settings.toml");
         let config_file_path = config_file_path.to_str().unwrap();
-        dbg!(config_file_path);
+
         if !Path::new(&config_file_path).exists() {
             Self::create_default(config_file_path)?;
         }
@@ -44,7 +44,7 @@ impl AppConfig {
         println!("Creating a new settings file: {path}");
         let default_dir = dirs::document_dir().unwrap().join("snes-input-display");
         let default_inputs_file_path = default_dir.join("inputs_addresses.json");
-        let default_skins_dir_path =  default_dir.join("skins");
+        let default_skins_dir_path = default_dir.join("skins");
 
         let config = AppConfig {
             controller: ControllerConfig {

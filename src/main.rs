@@ -3,10 +3,10 @@ mod configuration;
 mod controller;
 mod skins;
 use controller::{ButtonState, Controller};
-
 use ggez::{
     conf, event,
     graphics::{self, DrawParam},
+    input::keyboard::{KeyCode, KeyInput},
     timer::sleep,
     Context, ContextBuilder, GameResult,
 };
@@ -30,7 +30,7 @@ struct InputViewer {
     client: SyncClient,
     events: ButtonState,
     config: AppConfig,
-    theme: Theme
+    theme: Theme,
 }
 
 impl InputViewer {
@@ -38,7 +38,10 @@ impl InputViewer {
         let controller = Controller::new(&config.controller);
 
         let available_skins = Skin::list_available_skins(&config.skin.skins_path, ctx)?;
-        let skin = available_skins.get(&config.skin.skin_name).unwrap();
+        let skin = match available_skins.get(&config.skin.skin_name) {
+            Some(s) => s,
+            None => panic!("Skin name doesn't exist"),
+        };
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
@@ -79,7 +82,10 @@ impl InputViewer {
         let msg = format!("Attached to {}", &devices[0]);
         println!("{}", msg);
         dbg!(&skin.themes);
-        let theme = skin.themes.get(&config.skin.skin_theme.to_lowercase()).unwrap();
+        let theme = skin
+            .themes
+            .get(&config.skin.skin_theme.to_lowercase())
+            .unwrap();
 
         let width = theme.width;
         let height = theme.height;
@@ -93,33 +99,29 @@ impl InputViewer {
         })?;
 
         Ok(Self {
+            // TODO: find a way to not clone here ?
             available_skins: available_skins.clone(),
             controller,
             skin: skin.clone(),
             client,
             events: ButtonState::default(),
             config,
+            // TODO: find a way to not clone here ?
             theme: theme.clone(),
         })
     }
 }
 
-impl<'a> event::EventHandler for InputViewer {
+impl event::EventHandler for InputViewer {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        // Update code here...
-        // const DESIRED_FPS: u32 = 60;
+        // Grab controller events
         self.events = self.controller.pushed(&mut self.client).unwrap();
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         let mut canvas = graphics::Canvas::from_frame(ctx, None);
-        canvas.draw(
-            &self
-                .theme
-                .image,
-            DrawParam::new(),
-        );
+        canvas.draw(&self.theme.image, DrawParam::new());
 
         // Draw inputs
         self.events.iter().for_each(|event| {
@@ -130,6 +132,24 @@ impl<'a> event::EventHandler for InputViewer {
             );
         });
         canvas.finish(ctx)
+    }
+
+    fn key_down_event(&mut self, _ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
+        match input.keycode {
+            Some(KeyCode::S) => {
+                println!("S is pressed");
+                // changing Skin
+                for (name, skin) in &self.available_skins {
+                    dbg!(name);
+                }
+            }
+            // Changing theme
+            Some(KeyCode::T) => println!("T is pressed - Changing Theme"),
+            // Changing Layout
+            Some(KeyCode::L) => println!("L is pressed"),
+            _ => (),
+        }
+        Ok(())
     }
 }
 
