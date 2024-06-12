@@ -1,12 +1,12 @@
 [package]
 name = "snes_input_display"
-version = "0.2.3"
+version = "0.2.5"
 edition = "2021"
 license = " GPL-3.0-or-later"
 
 [profile.release]
 codegen-units = 1 # Improves code generation at the cost of increased compile time.
-strip = true  # Automatically strip symbols from the binary.
+strip = true      # Automatically strip symbols from the binary.
 lto = true
 
 [dependencies]
@@ -18,3 +18,5 @@ dirs = "5"
 ggez = "0.9"
 rusb2snes = "0.1"
 toml = "0.8"
+walkdir = "2.5"
+

@@ -13,7 +13,7 @@ use ggez::{
 };
 use rusb2snes::SyncClient;
 use skins::Skin;
-use std::{error::Error, time};
+use std::{env, error::Error, ffi::OsString, time};
 
 use configuration::AppConfig;
 
@@ -26,7 +26,7 @@ const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
     controller: Controller,
-    // available_skins: Vec<String>,
+    available_skins: Vec<OsString>,
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
@@ -36,8 +36,8 @@ impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
 
-        let available_skins = Skin::list_available_skins(&config.skin.skins_path);
-        dbg!(available_skins);
+        let available_skins = Skin::list_available_skins(&config.skin.skins_path, ctx)?;
+        dbg!(&available_skins);
 
         let skin = Skin::new(
             &config.skin.skins_path,
@@ -72,7 +72,7 @@ impl InputViewer {
         loop {
             match client.list_device() {
                 Ok(l) => {
-                    if l.len() > 0 {
+                    if !l.is_empty() {
                         devices = l;
                         break;
                     }
@@ -95,6 +95,7 @@ impl InputViewer {
 
         Ok(Self {
             controller,
+            available_skins,
             skin,
             client,
             events: ButtonState::default(),
@@ -146,7 +147,8 @@ impl event::EventHandler for InputViewer {
 
 fn main() -> Result<GameResult, Box<dyn Error>> {
     /* Setup Configs */
-    let app_config = AppConfig::new()?;
+    let config_path = env::args().nth(1);
+    let app_config = AppConfig::new(config_path)?;
 
     let (mut ctx, event_loop) = ContextBuilder::new(APP_NAME, "ChTBoner")
         .add_resource_path(&app_config.skin.skins_path)

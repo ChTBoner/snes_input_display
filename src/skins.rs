@@ -10,12 +10,24 @@ use std::{
     collections::{BTreeMap, HashMap},
     error::Error,
     ffi::OsString,
-    fs, io,
+    fmt, fs, io,
     io::Read,
     path::{Path, PathBuf},
 };
 
 use crate::controller::Pressed;
+use walkdir::WalkDir;
+
+#[derive(Debug)]
+struct NotASnesSkin(String);
+
+impl fmt::Display for NotASnesSkin {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "There is an error: {}", self.0)
+    }
+}
+
+impl Error for NotASnesSkin {}
 
 type LayoutResult = Result<(Vec<Theme>, BTreeMap<Pressed, Button>), Box<dyn Error>>;
 
@@ -51,30 +63,78 @@ impl Skin {
             theme: theme.to_owned(),
         })
     }
-    pub fn list_available_skins(path: &PathBuf) -> Result<Vec<OsString>, Box<dyn Error>> {
-        let mut available_skins = fs::read_dir(path)?
-            .map(|res| res.map(|e| e.file_name()))
-            .collect::<Result<Vec<_>, io::Error>>()?;
+    pub fn list_available_skins(
+        path: &PathBuf,
+        ctx: &mut Context,
+    ) -> Result<Vec<OsString>, Box<dyn Error>> {
+        let mut available_skins: Vec<OsString> = Vec::new();
 
-        // The order in which `read_dir` returns entries is not guaranteed. If reproducible
-        // ordering is required the entries should be explicitly sorted.
+        for entry in WalkDir::new(path).into_iter() {
+            let entry = entry?;
+            if entry.file_name() == "skin.xml" {
+                let skin_name = entry.path().parent().unwrap().file_name().unwrap();
+                // .to_string_lossy()
+                // .to_string();
+                // match Skin::new(entry.path(), &skin_name.to_string_lossy().to_string(), ctx) {
+                match get_layout(entry.path(), skin_name, ctx)
+                    Ok(s) => {
+                        available_skins.push(skin_name.into());
+                    }
+                    Err(e) => println!("Not a Snes Skin: {e}"),
+                };
+            }
+        }
+        // get jh
+        // let candidates = fs::read_dir(path)?
+        //     .map(|res| res.map(|e| e.file_name()))
+        //     .collect::<Result<Vec<_>, io::Error>>()?;
 
         available_skins.sort();
 
         Ok(available_skins)
     }
+
+    // pub fn list_available_skins(
+    //     path: &PathBuf,
+    //     ctx: &mut Context,
+    // ) -> Result<Vec<OsString>, Box<dyn Error>> {
+    //     let mut available_skins: Vec<OsString> = Vec::new();
+    //     for entry in WalkDir::new(path).into_iter() {
+    //         let entry = entry?;
+    //         if entry.file_name() == "skin.xml" {
+    //             let skin_name = entry.path().parent().unwrap().file_name().unwrap();
+    //             // .to_string_lossy()
+    //             // .to_string();
+    //
+    //             match Skin::new(entry.path(), &skin_name.to_string_lossy().to_string(), ctx) {
+    //                 Ok(s) => {
+    //                     available_skins.push(skin_name);
+    //                 }
+    //                 Err(e) => println!("Not a Snes Skin: {e}"),
+    //             };
+    //         }
+    //     }
+    //     Ok(available_skins)
+    // }
 }
 
 fn get_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult {
     let file = load_file(&file_path);
     let mut reader = Reader::from_str(&file);
-    let mut _metadata: HashMap<String, String> = HashMap::new();
     let mut backgrounds: Vec<Theme> = Vec::new();
     let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
 
     loop {
         match reader.read_event() {
-            // Ok(Event::Start(t)) => _metadata = parse_attributes(t),
+            // check if it's a snes skin type
+            Ok(Event::Start(t)) => {
+                if t.name().as_ref() == b"skin" {
+                    let metadata: HashMap<String, String> = parse_attributes(t);
+                    if metadata.get("type").unwrap() != &"snes".to_string() {
+                        return Err(Box::new(NotASnesSkin("Oops".into())));
+                    }
+                }
+            }
             Ok(Event::Empty(t)) => match t.name().as_ref() {
                 b"background" => {
                     let bg = Theme::new(t, name, ctx)?;
@@ -91,6 +151,7 @@ fn get_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult
             _ => (),
         }
     }
+
     Ok((backgrounds, buttons))
 }
 
