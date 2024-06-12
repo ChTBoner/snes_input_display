@@ -9,7 +9,7 @@ use quick_xml::{
 use std::{
     collections::{BTreeMap, HashMap},
     error::Error,
-    ffi::OsString,
+    ffi::{OsStr, OsString},
     fmt, fs, io,
     io::Read,
     path::{Path, PathBuf},
@@ -37,14 +37,14 @@ pub struct Skin {
     pub background: Theme,
     pub buttons: Box<ButtonsMap>,
     pub directory: PathBuf,
-    pub name: String,
+    pub name: OsString,
     pub theme: String,
 }
 
 impl Skin {
     pub fn new(
         path: &Path,
-        name: &String,
+        name: &OsString,
         theme: &String,
         ctx: &mut Context,
     ) -> Result<Skin, Box<dyn Error>> {
@@ -52,7 +52,7 @@ impl Skin {
         let file_path = path.join(name).join(skin_filename);
         let directory = file_path.parent().unwrap().to_owned();
 
-        let (backgrounds, buttons) = get_layout(file_path, name, ctx)?;
+        let (backgrounds, buttons) = get_layout(&file_path, name, ctx)?;
         let background = parse_backgrounds(backgrounds, theme).unwrap();
         Ok(Self {
             // metadata,
@@ -76,50 +76,22 @@ impl Skin {
                 // .to_string_lossy()
                 // .to_string();
                 // match Skin::new(entry.path(), &skin_name.to_string_lossy().to_string(), ctx) {
-                match get_layout(entry.path(), skin_name, ctx)
-                    Ok(s) => {
+                let (themes, buttons) = match get_layout(path, skin_name, ctx) {
+                    Ok(_) => {
                         available_skins.push(skin_name.into());
                     }
                     Err(e) => println!("Not a Snes Skin: {e}"),
                 };
             }
         }
-        // get jh
-        // let candidates = fs::read_dir(path)?
-        //     .map(|res| res.map(|e| e.file_name()))
-        //     .collect::<Result<Vec<_>, io::Error>>()?;
-
         available_skins.sort();
 
         Ok(available_skins)
     }
-
-    // pub fn list_available_skins(
-    //     path: &PathBuf,
-    //     ctx: &mut Context,
-    // ) -> Result<Vec<OsString>, Box<dyn Error>> {
-    //     let mut available_skins: Vec<OsString> = Vec::new();
-    //     for entry in WalkDir::new(path).into_iter() {
-    //         let entry = entry?;
-    //         if entry.file_name() == "skin.xml" {
-    //             let skin_name = entry.path().parent().unwrap().file_name().unwrap();
-    //             // .to_string_lossy()
-    //             // .to_string();
-    //
-    //             match Skin::new(entry.path(), &skin_name.to_string_lossy().to_string(), ctx) {
-    //                 Ok(s) => {
-    //                     available_skins.push(skin_name);
-    //                 }
-    //                 Err(e) => println!("Not a Snes Skin: {e}"),
-    //             };
-    //         }
-    //     }
-    //     Ok(available_skins)
-    // }
 }
 
-fn get_layout(file_path: PathBuf, name: &str, ctx: &mut Context) -> LayoutResult {
-    let file = load_file(&file_path);
+fn get_layout(file_path: &Path, name: &OsStr, ctx: &mut Context) -> LayoutResult {
+    let file = load_file(file_path);
     let mut reader = Reader::from_str(&file);
     let mut backgrounds: Vec<Theme> = Vec::new();
     let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
@@ -222,7 +194,7 @@ pub struct Button {
 }
 
 impl Button {
-    fn new(t: BytesStart, dir: &str, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
+    fn new(t: BytesStart, dir: &OsStr, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
         let attributes = parse_attributes(t);
         let x = attributes["x"].parse::<f32>().unwrap();
         let y = attributes["y"].parse::<f32>().unwrap();

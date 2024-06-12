@@ -1,6 +1,7 @@
 // use config::{Config, ConfigError};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
+use std::ffi::OsString;
 use std::fs::{read_to_string, write, File};
 use std::path::{Path, PathBuf};
 
@@ -13,7 +14,7 @@ pub struct ControllerConfig {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SkinConfig {
     pub skins_path: PathBuf,
-    pub skin_name: String,
+    pub skin_name: OsString,
     pub skin_theme: String,
 }
 
@@ -56,7 +57,7 @@ impl AppConfig {
             },
             skin: SkinConfig {
                 skins_path: default_skins_dir_path,
-                skin_name: "skin_folder_name".to_string(),
+                skin_name: OsString::from("skin_folder_name"),
                 skin_theme: "skin_theme".to_string(),
             },
         };

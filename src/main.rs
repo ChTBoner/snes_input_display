@@ -27,6 +27,7 @@ const APP_NAME: &str = "Snes Input Display";
 struct InputViewer {
     controller: Controller,
     available_skins: Vec<OsString>,
+    // available_themes
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
