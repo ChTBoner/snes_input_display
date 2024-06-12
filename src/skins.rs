@@ -9,10 +9,10 @@ use quick_xml::{
 use std::{
     collections::{BTreeMap, HashMap},
     error::Error,
-    fs,
+    ffi::OsString,
+    fs, io,
     io::Read,
-    path::Path,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use crate::controller::Pressed;
@@ -50,6 +50,18 @@ impl Skin {
             name: name.to_owned(),
             theme: theme.to_owned(),
         })
+    }
+    pub fn list_available_skins(path: &PathBuf) -> Result<Vec<OsString>, Box<dyn Error>> {
+        let mut available_skins = fs::read_dir(path)?
+            .map(|res| res.map(|e| e.file_name()))
+            .collect::<Result<Vec<_>, io::Error>>()?;
+
+        // The order in which `read_dir` returns entries is not guaranteed. If reproducible
+        // ordering is required the entries should be explicitly sorted.
+
+        available_skins.sort();
+
+        Ok(available_skins)
     }
 }
 

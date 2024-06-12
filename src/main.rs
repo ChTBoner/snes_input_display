@@ -5,7 +5,11 @@ mod skins;
 use controller::{ButtonState, Controller};
 
 use ggez::{
-    conf, event, graphics::{self, DrawParam}, timer::sleep, Context, ContextBuilder, GameResult
+    conf, event,
+    graphics::{self, DrawParam},
+    input::keyboard::{KeyCode, KeyInput},
+    timer::sleep,
+    Context, ContextBuilder, GameResult,
 };
 use rusb2snes::SyncClient;
 use skins::Skin;
@@ -22,6 +26,7 @@ const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
     controller: Controller,
+    // available_skins: Vec<String>,
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
@@ -30,6 +35,9 @@ struct InputViewer {
 impl InputViewer {
     fn new(ctx: &mut Context, config: AppConfig) -> Result<Self, Box<dyn Error>> {
         let controller = Controller::new(&config.controller);
+
+        let available_skins = Skin::list_available_skins(&config.skin.skins_path);
+        dbg!(available_skins);
 
         let skin = Skin::new(
             &config.skin.skins_path,
@@ -40,7 +48,7 @@ impl InputViewer {
 
         /* Connect to USB2SNES Server */
         let mut client: SyncClient;
-        
+
         // loop until connected to usb2snes
         loop {
             match SyncClient::connect() {
@@ -49,11 +57,11 @@ impl InputViewer {
                     let msg = format!("Connected to {}", &client.app_version()?);
                     println!("{}", msg);
                     break;
-                },
+                }
                 Err(_) => {
                     println!("Not connected to a usb2snes client");
                     sleep(time::Duration::from_secs(1));
-                }, 
+                }
             }
         }
 
@@ -64,20 +72,18 @@ impl InputViewer {
         loop {
             match client.list_device() {
                 Ok(l) => {
-                    if l.len() > 0 { 
+                    if l.len() > 0 {
                         devices = l;
                         break;
                     }
-                },
-                Err(_) => println!("Error listing devices")
+                }
+                Err(_) => println!("Error listing devices"),
             }
         }
 
         client.attach(&devices[0])?;
         let msg = format!("Attached to {}", &devices[0]);
         println!("{}", msg);
-
-
 
         // Set the window size
         ctx.gfx.set_mode(conf::WindowMode {
@@ -117,6 +123,24 @@ impl event::EventHandler for InputViewer {
             );
         });
         canvas.finish(ctx)
+    }
+
+    fn key_down_event(&mut self, _ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
+        match input.keycode {
+            Some(KeyCode::S) => {
+                println!("S is pressed");
+                // changing Skin
+                // for (name, skin) in &self.available_skins {
+                //     dbg!(name);
+                // }
+            }
+            // Changing theme
+            Some(KeyCode::T) => println!("T is pressed - Changing Theme"),
+            // Changing Layout
+            Some(KeyCode::L) => println!("L is pressed"),
+            _ => (),
+        }
+        Ok(())
     }
 }
 
