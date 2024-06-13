@@ -37,15 +37,15 @@ pub struct Skin {
     pub background: Theme,
     pub buttons: Box<ButtonsMap>,
     pub directory: PathBuf,
-    pub name: OsString,
+    pub name: String,
     pub theme: String,
 }
 
 impl Skin {
     pub fn new(
         path: &Path,
-        name: &OsString,
-        theme: &String,
+        name: &String,
+        theme: Option<&String>,
         ctx: &mut Context,
     ) -> Result<Skin, Box<dyn Error>> {
         let skin_filename = "skin.xml";
@@ -53,33 +53,38 @@ impl Skin {
         let directory = file_path.parent().unwrap().to_owned();
 
         let (backgrounds, buttons) = get_layout(&file_path, name, ctx)?;
+
         let background = parse_backgrounds(backgrounds, theme).unwrap();
+        let theme_name = background.theme.to_owned();
         Ok(Self {
             // metadata,
             background,
             buttons: buttons_map_to_array(buttons),
             directory,
             name: name.to_owned(),
-            theme: theme.to_owned(),
+            theme: theme_name,
         })
     }
     pub fn list_available_skins(
         path: &PathBuf,
         ctx: &mut Context,
-    ) -> Result<Vec<OsString>, Box<dyn Error>> {
-        let mut available_skins: Vec<OsString> = Vec::new();
+    ) -> Result<Vec<String>, Box<dyn Error>> {
+        let mut available_skins: Vec<String> = Vec::new();
 
         for entry in WalkDir::new(path).into_iter() {
             let entry = entry?;
             if entry.file_name() == "skin.xml" {
-                let skin_name = entry.path().parent().unwrap().file_name().unwrap();
-                // .to_string_lossy()
-                // .to_string();
-                // match Skin::new(entry.path(), &skin_name.to_string_lossy().to_string(), ctx) {
-                let (themes, buttons) = match get_layout(path, skin_name, ctx) {
-                    Ok(_) => {
-                        available_skins.push(skin_name.into());
-                    }
+                let skin_name = entry
+                    .path()
+                    .parent()
+                    .unwrap()
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string();
+
+                match get_layout(entry.path(), &skin_name, ctx) {
+                    Ok(_) => available_skins.push(skin_name.into()),
                     Err(e) => println!("Not a Snes Skin: {e}"),
                 };
             }
@@ -90,7 +95,7 @@ impl Skin {
     }
 }
 
-fn get_layout(file_path: &Path, name: &OsStr, ctx: &mut Context) -> LayoutResult {
+fn get_layout(file_path: &Path, name: &String, ctx: &mut Context) -> LayoutResult {
     let file = load_file(file_path);
     let mut reader = Reader::from_str(&file);
     let mut backgrounds: Vec<Theme> = Vec::new();
@@ -134,10 +139,13 @@ fn load_file(path: &Path) -> String {
     text
 }
 
-fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: &String) -> Option<Theme> {
-    backgrounds_vec
-        .into_iter()
-        .find(|background| background.theme.eq(theme))
+fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: Option<&String>) -> Option<Theme> {
+    match theme {
+        Some(t) => backgrounds_vec.into_iter()
+        .find(|background| background.theme.eq(t)),
+        // return first theme available
+        None => Some(backgrounds_vec[0].to_owned()),
+    }
 }
 
 /// Produces an boxed array indexable by `Pressed` that maps a single button press to an
@@ -170,7 +178,7 @@ pub struct Theme {
 }
 
 impl Theme {
-    fn new(t: BytesStart, dir: &str, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
+    fn new(t: BytesStart, dir: &String, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
         let attributes = parse_attributes(t);
         let image_path = Path::new("/").join(dir).join(&attributes["image"]);
         let image = Image::from_path(ctx, image_path)?;
@@ -194,7 +202,7 @@ pub struct Button {
 }
 
 impl Button {
-    fn new(t: BytesStart, dir: &OsStr, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
+    fn new(t: BytesStart, dir: &String, ctx: &mut Context) -> Result<Self, Box<dyn Error>> {
         let attributes = parse_attributes(t);
         let x = attributes["x"].parse::<f32>().unwrap();
         let y = attributes["y"].parse::<f32>().unwrap();

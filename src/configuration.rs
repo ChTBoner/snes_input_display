@@ -14,7 +14,7 @@ pub struct ControllerConfig {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SkinConfig {
     pub skins_path: PathBuf,
-    pub skin_name: OsString,
+    pub skin_name: String,
     pub skin_theme: String,
 }
 
@@ -33,10 +33,10 @@ impl AppConfig {
                 .join("snes-input-display")
                 .join("settings.toml"),
         };
-        let config_file_path = config_file_path.to_str().unwrap();
-        dbg!(config_file_path);
+        // let config_file_path = config_file_path.to_str().unwrap();
+        // dbg!(config_file_path);
         if !Path::new(&config_file_path).exists() {
-            Self::create_default(config_file_path)?;
+            Self::create_default(&config_file_path)?;
         }
         // let mut file = File::open(config_file_path)?;
         let contents = read_to_string(config_file_path)?;
@@ -44,8 +44,8 @@ impl AppConfig {
         Ok(config)
     }
 
-    fn create_default(path: &str) -> Result<(), Box<dyn Error>> {
-        println!("Creating a new settings file: {path}");
+    fn create_default(path: &PathBuf) -> Result<(), Box<dyn Error>> {
+        // println!("Creating a new settings file: {path}");
         let default_dir = dirs::document_dir().unwrap().join("snes-input-display");
         let default_inputs_file_path = default_dir.join("inputs_addresses.json");
         let default_skins_dir_path = default_dir.join("skins");
@@ -57,7 +57,7 @@ impl AppConfig {
             },
             skin: SkinConfig {
                 skins_path: default_skins_dir_path,
-                skin_name: OsString::from("skin_folder_name"),
+                skin_name: String::from("skin_folder_name"),
                 skin_theme: "skin_theme".to_string(),
             },
         };

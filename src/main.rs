@@ -14,6 +14,7 @@ use ggez::{
 use rusb2snes::SyncClient;
 use skins::Skin;
 use std::{env, error::Error, ffi::OsString, time};
+use std::ops::Index;
 
 use configuration::AppConfig;
 
@@ -26,11 +27,12 @@ const APP_NAME: &str = "Snes Input Display";
 
 struct InputViewer {
     controller: Controller,
-    available_skins: Vec<OsString>,
+    available_skins: Vec<String>,
     // available_themes
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
+    config: AppConfig
 }
 
 impl InputViewer {
@@ -43,7 +45,7 @@ impl InputViewer {
         let skin = Skin::new(
             &config.skin.skins_path,
             &config.skin.skin_name,
-            &config.skin.skin_theme.to_lowercase(),
+            Some(&config.skin.skin_theme.to_lowercase()),
             ctx,
         )?;
 
@@ -100,6 +102,7 @@ impl InputViewer {
             skin,
             client,
             events: ButtonState::default(),
+            config
         })
     }
 }
@@ -127,17 +130,43 @@ impl event::EventHandler for InputViewer {
         canvas.finish(ctx)
     }
 
-    fn key_down_event(&mut self, _ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
+    fn key_down_event(&mut self, ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
         match input.keycode {
             Some(KeyCode::S) => {
                 println!("S is pressed");
-                // changing Skin
-                // for (name, skin) in &self.available_skins {
-                //     dbg!(name);
-                // }
+                // find next Skin in available skins
+                let max_available_skins_index = self.available_skins.len() - 1 ;
+                dbg!(&max_available_skins_index);
+                if  max_available_skins_index > 0 {
+                    let next_skin_position = match self.available_skins.iter().position(|s| s == &self.config.skin.skin_name) {
+                        Some(i) if i == max_available_skins_index => 0,
+                        Some(i ) => i + 1,
+                        None => 0,
+                    };
+                    let next_skin_name = &self.available_skins[next_skin_position];
+                    dbg!(next_skin_name);
+                    self.skin = Skin::new(
+                        &self.config.skin.skins_path,
+                        next_skin_name,
+                        None,
+                        ctx,
+                    ).unwrap();
+                    dbg!(&self.skin.theme);
+                    ctx.gfx.set_mode(conf::WindowMode {
+                        width: self.skin.background.image.width() as f32,
+                        height: self.skin.background.height,
+                        resizable: true,
+                        ..Default::default()
+                    })?;
+                }
+
+
             }
             // Changing theme
-            Some(KeyCode::T) => println!("T is pressed - Changing Theme"),
+            Some(KeyCode::T) => {
+                println!("T is pressed - Changing Theme")
+                //
+            },
             // Changing Layout
             Some(KeyCode::L) => println!("L is pressed"),
             _ => (),
