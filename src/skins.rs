@@ -52,9 +52,9 @@ impl Skin {
         let file_path = path.join(name).join(skin_filename);
         let directory = file_path.parent().unwrap().to_owned();
 
-        let (backgrounds, buttons) = get_layout(&file_path, name, ctx)?;
+        let (backgrounds, buttons) = Skin::get_layout(&file_path, name, ctx)?;
 
-        let background = parse_backgrounds(backgrounds, theme).unwrap();
+        let background = Skin::parse_backgrounds(backgrounds, theme).unwrap();
         let theme_name = background.theme.to_owned();
         Ok(Self {
             // metadata,
@@ -65,6 +65,7 @@ impl Skin {
             theme: theme_name,
         })
     }
+
     pub fn list_available_skins(
         path: &PathBuf,
         ctx: &mut Context,
@@ -83,7 +84,7 @@ impl Skin {
                     .to_string_lossy()
                     .to_string();
 
-                match get_layout(entry.path(), &skin_name, ctx) {
+                match Skin::get_layout(entry.path(), &skin_name, ctx) {
                     Ok(_) => available_skins.push(skin_name.into()),
                     Err(e) => println!("Not a Snes Skin: {e}"),
                 };
@@ -93,43 +94,71 @@ impl Skin {
 
         Ok(available_skins)
     }
-}
 
-fn get_layout(file_path: &Path, name: &String, ctx: &mut Context) -> LayoutResult {
-    let file = load_file(file_path);
-    let mut reader = Reader::from_str(&file);
-    let mut backgrounds: Vec<Theme> = Vec::new();
-    let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
+    fn get_layout(file_path: &Path, name: &String, ctx: &mut Context) -> LayoutResult {
+        let file = load_file(file_path);
+        let mut reader = Reader::from_str(&file);
+        let mut backgrounds: Vec<Theme> = Vec::new();
+        let mut buttons: BTreeMap<Pressed, Button> = BTreeMap::new();
 
-    loop {
-        match reader.read_event() {
-            // check if it's a snes skin type
-            Ok(Event::Start(t)) => {
-                if t.name().as_ref() == b"skin" {
-                    let metadata: HashMap<String, String> = parse_attributes(t);
-                    if metadata.get("type").unwrap() != &"snes".to_string() {
-                        return Err(Box::new(NotASnesSkin("Oops".into())));
+        loop {
+            match reader.read_event() {
+                // check if it's a snes skin type
+                Ok(Event::Start(t)) => {
+                    if t.name().as_ref() == b"skin" {
+                        let metadata: HashMap<String, String> = parse_attributes(t);
+                        if metadata.get("type").unwrap() != &"snes".to_string() {
+                            return Err(Box::new(NotASnesSkin("Oops".into())));
+                        }
                     }
                 }
+                Ok(Event::Empty(t)) => match t.name().as_ref() {
+                    b"background" => {
+                        let bg = Theme::new(t, name, ctx)?;
+                        backgrounds.push(bg);
+                    }
+                    b"button" => {
+                        let bt = Button::new(t, name, ctx)?;
+                        buttons.insert(bt.name, bt);
+                    }
+                    _ => {}
+                },
+                Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+                Ok(Event::Eof) => break,
+                _ => (),
             }
-            Ok(Event::Empty(t)) => match t.name().as_ref() {
-                b"background" => {
-                    let bg = Theme::new(t, name, ctx)?;
-                    backgrounds.push(bg);
-                }
-                b"button" => {
-                    let bt = Button::new(t, name, ctx)?;
-                    buttons.insert(bt.name, bt);
-                }
-                _ => {}
-            },
-            Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
-            Ok(Event::Eof) => break,
-            _ => (),
         }
+
+        Ok((backgrounds, buttons))
     }
 
-    Ok((backgrounds, buttons))
+    fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: Option<&String>) -> Option<Theme> {
+        match theme {
+            Some(t) => backgrounds_vec
+                .into_iter()
+                .find(|background| background.theme.eq(t)),
+            // return first theme available
+            None => Some(backgrounds_vec[0].to_owned()),
+        }
+    }
+}
+
+fn parse_attributes(t: BytesStart) -> HashMap<String, String> {
+    let mut attributes_map = HashMap::new();
+    let attributes = t.attributes().map(|a| a.unwrap());
+    for attribute in attributes {
+        let value = attribute.unescape_value().unwrap().into_owned();
+        let mut key = String::new();
+        attribute
+            .key
+            .local_name()
+            .into_inner()
+            .read_to_string(&mut key)
+            .unwrap();
+
+        attributes_map.insert(key, value);
+    }
+    attributes_map
 }
 
 fn load_file(path: &Path) -> String {
@@ -137,15 +166,6 @@ fn load_file(path: &Path) -> String {
     let mut text = String::new();
     file.read_to_string(&mut text).unwrap();
     text
-}
-
-fn parse_backgrounds(backgrounds_vec: Vec<Theme>, theme: Option<&String>) -> Option<Theme> {
-    match theme {
-        Some(t) => backgrounds_vec.into_iter()
-        .find(|background| background.theme.eq(t)),
-        // return first theme available
-        None => Some(backgrounds_vec[0].to_owned()),
-    }
 }
 
 /// Produces an boxed array indexable by `Pressed` that maps a single button press to an
@@ -235,24 +255,6 @@ impl Button {
             rect: Rect::new(x, y, width, height),
         })
     }
-}
-
-fn parse_attributes(t: BytesStart) -> HashMap<String, String> {
-    let mut attributes_map = HashMap::new();
-    let attributes = t.attributes().map(|a| a.unwrap());
-    for attribute in attributes {
-        let value = attribute.unescape_value().unwrap().into_owned();
-        let mut key = String::new();
-        attribute
-            .key
-            .local_name()
-            .into_inner()
-            .read_to_string(&mut key)
-            .unwrap();
-
-        attributes_map.insert(key, value);
-    }
-    attributes_map
 }
 
 /// A wrapper over an array `[Button; 12]` indexable by `Pressed`. The array is internally ordered

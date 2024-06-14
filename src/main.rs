@@ -13,8 +13,8 @@ use ggez::{
 };
 use rusb2snes::SyncClient;
 use skins::Skin;
-use std::{env, error::Error, ffi::OsString, time};
 use std::ops::Index;
+use std::{env, error::Error, ffi::OsString, time};
 
 use configuration::AppConfig;
 
@@ -32,7 +32,7 @@ struct InputViewer {
     skin: Skin,
     client: SyncClient,
     events: ButtonState,
-    config: AppConfig
+    config: AppConfig,
 }
 
 impl InputViewer {
@@ -102,7 +102,7 @@ impl InputViewer {
             skin,
             client,
             events: ButtonState::default(),
-            config
+            config,
         })
     }
 }
@@ -132,26 +132,35 @@ impl event::EventHandler for InputViewer {
 
     fn key_down_event(&mut self, ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
         match input.keycode {
-            Some(KeyCode::S) => {
-                println!("S is pressed");
+            Some(KeyCode::R) => {
+                // refresh available skins ?
+                println!("R is pressed refreshing available skins.");
+                match Skin::list_available_skins(&self.config.skin.skins_path, ctx) {
+                    Ok(s) => self.available_skins = s,
+                    Err(_) => println!("Couldn't refresh available skins"),
+                }
+            }
+            Some(KeyCode::T) => {
+                println!("T is pressed - Changing Theme");
                 // find next Skin in available skins
-                let max_available_skins_index = self.available_skins.len() - 1 ;
-                dbg!(&max_available_skins_index);
-                if  max_available_skins_index > 0 {
-                    let next_skin_position = match self.available_skins.iter().position(|s| s == &self.config.skin.skin_name) {
+                let max_available_skins_index = self.available_skins.len() - 1;
+                // dbg!(&max_available_skins_index);
+                if max_available_skins_index > 0 {
+                    let next_skin_position = match self
+                        .available_skins
+                        .iter()
+                        .position(|s| s == &self.config.skin.skin_name)
+                    {
                         Some(i) if i == max_available_skins_index => 0,
-                        Some(i ) => i + 1,
+                        Some(i) => i + 1,
                         None => 0,
                     };
                     let next_skin_name = &self.available_skins[next_skin_position];
-                    dbg!(next_skin_name);
-                    self.skin = Skin::new(
-                        &self.config.skin.skins_path,
-                        next_skin_name,
-                        None,
-                        ctx,
-                    ).unwrap();
-                    dbg!(&self.skin.theme);
+                    // dbg!(next_skin_name);
+                    // update Input viewer Skin with next one
+                    self.skin =
+                        Skin::new(&self.config.skin.skins_path, next_skin_name, None, ctx).unwrap();
+                    // dbg!(&self.skin.theme);
                     ctx.gfx.set_mode(conf::WindowMode {
                         width: self.skin.background.image.width() as f32,
                         height: self.skin.background.height,
@@ -159,14 +168,12 @@ impl event::EventHandler for InputViewer {
                         ..Default::default()
                     })?;
                 }
-
-
             }
             // Changing theme
-            Some(KeyCode::T) => {
+            Some(KeyCode::B) => {
                 println!("T is pressed - Changing Theme")
                 //
-            },
+            }
             // Changing Layout
             Some(KeyCode::L) => println!("L is pressed"),
             _ => (),
