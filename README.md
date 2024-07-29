@@ -5,6 +5,8 @@ Displays your SNES input reading directly from the console data, built in Rust w
 
 Completely compatible with the [RetroSpy](https://retro-spy.com) Skin format for Super Nintendo controllers.
 
+Note: the USB handling of the FxPax/Sd2Snes has up to five frames of jitter at all times. If you're using one of those flash carts and you want an input display that is more accurate than that, you'll need a hardware device like a RetroSpy.
+
 ## Requirements
 ### Software
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
