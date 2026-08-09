@@ -6,7 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Install alsa and udev deps for linux
+        shell: bash
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+
       - uses: jdx/mise-action@v4
         with:
           export_path: true
+
       - uses: j178/prek-action@v3.0.0
