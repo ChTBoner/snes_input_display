@@ -1,0 +1,12 @@
+name: Code checks
+on: [push, pull_request]
+
+jobs:
+  prek:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          export_path: true
+      - uses: j178/prek-action@v3.0.0
