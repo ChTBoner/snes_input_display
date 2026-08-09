@@ -22,7 +22,7 @@ impl Button {
         let x = attributes.get("x").ok_or("missing x")?.parse::<f32>()?;
         let y = attributes.get("y").ok_or("missing y")?.parse::<f32>()?;
         let image_rel = attributes.get("image").ok_or("missing image")?;
-        let image_path =  Path::new(MAIN_SEPARATOR_STR).join(skin_dir).join(image_rel);
+        let image_path = Path::new(MAIN_SEPARATOR_STR).join(skin_dir).join(image_rel);
 
         let image = Image::from_path(ctx, image_path)?;
         // let image_info = ImageInfo::from_file_path(&image_path)?;

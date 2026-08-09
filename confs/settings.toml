@@ -9,6 +9,6 @@ layout = "Default"
 skins_path = 'C:\Users\example\Documents\squabbler-retrospy-nintendospy-skins\skins'
 # skins_name: Folder name of the skin you want to use
 skin_name = "snes-super-famicom-squabbler"
-# skins_theme = value '<background name> you want to use, found in the theme's xml file' 
+# skins_theme = value '<background name> you want to use, found in the theme's xml file'
 # ex: <background name="Black" image="input-display-overlay-famicom.png" />
 skin_theme = "black"

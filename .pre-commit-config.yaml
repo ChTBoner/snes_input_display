@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-toml
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        language: system
+        entry: cargo fmt --all --
+        types: [rust]
+        pass_filenames: false
+      - id: cargo-clippy
+        name: cargo clippy
+        language: system
+        entry: cargo clippy --all-targets --all-features -- -D warnings
+        types: [rust]
+        pass_filenames: false
+      - id: cargo-check
+        name: cargo check
+        language: system
+        entry: cargo check --all-targets
+        types: [rust]
+        pass_filenames: false
+      - id: taplo-fmt
+        name: format toml files
+        language: system
+        entry: taplo fmt
+      - id: taplo-check
+        name: check toml files
+        language: system
+        entry: taplo check
+      - id: markdown-cli2
+        name: Fix and formats markdown
+        language: system
+        entry: markdownlint-cli2
+        types: [markdown]

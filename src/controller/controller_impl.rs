@@ -30,12 +30,10 @@ impl ControllerData {
         // get path of layouts json from config file
         let config_data = fs::read_to_string(&config.input_config_path)?;
 
-        let available_addresses: ControllerLayouts =
-            serde_json::from_str(&config_data)?;
+        let available_addresses: ControllerLayouts = serde_json::from_str(&config_data)?;
 
-        let mut available_layouts: Vec<String> = available_addresses
-            .layouts.keys().cloned()
-            .collect();
+        let mut available_layouts: Vec<String> =
+            available_addresses.layouts.keys().cloned().collect();
         available_layouts.sort();
 
         let current_layout_index = available_layouts

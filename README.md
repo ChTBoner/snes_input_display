@@ -1,39 +1,53 @@
 # SnITCH - Snes Input Tracking Controller HUD
+
 ![image info](images/snes_controller.png)
 
-Displays your SNES input reading directly from the console data, built in Rust with [ggez](https://ggez.rs).
+Displays your SNES input reading directly from the console data. built in Rust with [ggez](https://ggez.rs).
 
 Completely compatible with the [RetroSpy](https://retro-spy.com) Skin format for Super Nintendo controllers.
 
-Note: the USB handling of the FxPax/Sd2Snes has up to five frames of jitter at all times. If you're using one of those flash carts and you want an input display that is more accurate than that, you'll need a hardware device like a RetroSpy.
+Note: the USB handling of the FxPax/Sd2Snes has up to five frames of jitter at all times.
+you'll need a hardware device like a RetroSpy.
+If you're using one of those flash carts and you want an input display that is more accurate than that,
 
 ## Requirements
+
 ### Software
+
 - [QUsb2Snes](https://skarsnik.github.io/QUsb2snes/) or [SNI](https://github.com/alttpo/sni)
 - Sd2Snes or FxPak Pro for original hardware
 
-NOTE: Tested working with [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa), and [bsnes-plus](https://github.com/black-sliver/bsnes-plus.git) but NOT with the Default layout.
+NOTE: Tested working with:
+
+- [snes9x-emunwa](https://github.com/Skarsnik/snes9x-emunwa)
+- [bsnes-plus](https://github.com/black-sliver/bsnes-plus.git) but NOT with the Default layout.
 
 ### Configuration File
+
 A configuration file named "settings.toml" at this location (see below for details):
+
 - Windows: %localappdata%\snes-input-display\
 - MacOS: $HOME/Library/Application Support/snes-input-display
 - Linux: $HOME/.config/snes-input-display
 
 ### Skins
-Retrospy compatible skins. 
 
-You can find great skins here: 
- - https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
- - https://proximitysound.itch.io/skins
+Retrospy compatible skins.
+
+You can find great skins here:
+
+- <https://github.com/developwisely/squabbler-retrospy-nintendospy-skins>
+- <https://proximitysound.itch.io/skins>
 
 ## Configuration
 
-If no configuration file is found at startup, it will create a file with bogus values at the locations stated above, and exit. 
+If no configuration file is found at startup,
+it will create a file with default values at the location stated above, and exit.
 
 It will not work until all is correct in the configuration file.
 
 Paths must be in between single quotes
+
 ```toml
 [controller]
 # input_config_path: Path to read for input memory addresses (you can copy paste the contents of )
@@ -57,7 +71,8 @@ address = "127.0.0.1"
 port = 23074
 
 ```
-A settings file example can be found [here](./confs/settings.toml)
+
+A settings file example can be found here: [confs/settings.toml](./confs/settings.toml)
 
 ### For Linux and MacOS
 
@@ -72,6 +87,7 @@ $ chmod +x snes_input_display_mac_amd64
 ```
 
 ## Keyboard shortcurts (aka. Your introduction to vim motions... :D)
+
 - j = select next entry in the layouts from the controller config file
 - k = select previous entry in the layouts from the controller config file
 - h = select the previous available retroskin
@@ -82,6 +98,7 @@ $ chmod +x snes_input_display_mac_amd64
 > Changing skin under Wayland is buggy and might not work as expected.
 
 ## Game List Working with the Defaults layout
+
 You should try with the Default Layout if you're on the Sd2Snes/FxPakPro. It will NOT work with an emulator
 The F90718 address doesn't work on emulator.
 
@@ -148,14 +165,16 @@ The controller config file must be in the json format
 You can add addresses to the file for your game if needed.
 The RAM Search tools of Bizhawk are great to find the values.
 
-An example file can be found [here](./confs/Defaults.json)
+An example file can be found here: [confs/Defaults.json](./confs/Defaults.json)
+
 ## TROUBLESHOOTING
+
 Make sure all paths and info are correct in the configuration file.
 
-
 ## Credits
+
 [Skarsnik](https://github.com/Skarsnik)
 
-https://github.com/developwisely/squabbler-retrospy-nintendospy-skins
+<https://github.com/developwisely/squabbler-retrospy-nintendospy-skins>
 
 GNU GPLv3

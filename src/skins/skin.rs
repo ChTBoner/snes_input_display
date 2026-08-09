@@ -68,11 +68,7 @@ impl SkinData {
     }
 
     fn get_current_skin_index(&mut self, skin_name: &String) -> Result<usize, Box<dyn Error>> {
-        let index = match self
-            .available_skins
-            .iter()
-            .position(|x| x == skin_name)
-        {
+        let index = match self.available_skins.iter().position(|x| x == skin_name) {
             Some(i) => i,
             None => return Err("Error getting skin index".into()),
         };
