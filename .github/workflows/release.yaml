@@ -13,16 +13,20 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: SnITCH
-            asset_name: SnITCH-linux-amd64
+            asset_name: SnITCH-linux-x86_64
+            arch: x86_64
           - os: windows-latest
             artifact_name: SnITCH.exe
-            asset_name: SnITCH-windows-amd64.exe
+            asset_name: SnITCH-windows-x86_64.exe
+            arch: x86_64
           - os: macos-15-intel
             artifact_name: SnITCH
-            asset_name: SnITCH-macos-amd64
+            asset_name: SnITCH-macos-x86_64
+            arch: x86_64
           - os: macos-latest
             artifact_name: SnITCH
             asset_name: SnITCH-macos-arm64
+            arch: arm64
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -39,7 +43,14 @@ jobs:
       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
 
     - name: Run cargo build --release
+      if: ${{ runner.os != 'macOS' }}
       run: cargo build --release
+
+    - name: Build macOS release and DMG
+      if: ${{ runner.os == 'macOS' }}
+      run: |
+        chmod +x package_macos.sh
+        ./package_macos.sh
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
@@ -47,4 +58,13 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ github.workspace }}/target/release/${{ matrix.artifact_name }}
         asset_name: ${{ matrix.asset_name }}
+        tag: ${{ github.ref }}
+
+    - name: Upload macOS DMG to release
+      if: ${{ runner.os == 'macOS' }}
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ github.workspace }}/dist/SnITCH-${{ matrix.arch }}.dmg
+        asset_name: SnITCH-${{ matrix.arch }}.dmg
         tag: ${{ github.ref }}

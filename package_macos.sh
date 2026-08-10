@@ -126,8 +126,23 @@ if [ -f "README.md" ]; then
 fi
 
 # Build the DMG
-echo "Building SnITCH.dmg..."
-DMG_PATH="dist/SnITCH.dmg"
+if [ -z "$ARCH" ]; then
+    RAW_ARCH=$(uname -m)
+    case "$RAW_ARCH" in
+        x86_64)
+            ARCH="intel"
+            ;;
+        arm64|aarch64)
+            ARCH="arm64"
+            ;;
+        *)
+            ARCH="$RAW_ARCH"
+            ;;
+    esac
+fi
+
+DMG_PATH="dist/SnITCH-${ARCH}.dmg"
+echo "Building $DMG_PATH..."
 rm -f "$DMG_PATH"
 
 hdiutil create -volname "SnITCH Installer" -srcfolder "$DMG_ROOT" -ov -format UDZO "$DMG_PATH"
@@ -137,5 +152,5 @@ rm -rf "$DMG_ROOT"
 
 echo "=== Packaging successfully completed! ==="
 echo "Artifacts are located in the 'dist' directory:"
-echo " - App Bundle: dist/SnITCH.app"
-echo " - DMG Installer: dist/SnITCH.dmg"
+echo " - App Bundle: $APP_DIR"
+echo " - DMG Installer: $DMG_PATH"
