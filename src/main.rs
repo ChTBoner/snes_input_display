@@ -14,7 +14,18 @@ fn main() -> Result<GameResult, Box<dyn Error>> {
     /* Setup Configs */
     let config_path = env::args().nth(1);
     let app_config = AppConfig::new(config_path)?;
+    app_config.init_logging()?;
 
+    match run(app_config) {
+        Ok(res) => Ok(res),
+        Err(e) => {
+            log::error!("Application error: {:#?}", e);
+            Err(e)
+        }
+    }
+}
+
+fn run(app_config: AppConfig) -> Result<GameResult, Box<dyn Error>> {
     let (mut ctx, event_loop) = ContextBuilder::new(APP_NAME, "ChTPwner")
         .add_resource_path(&app_config.skin.skins_path)
         .build()
@@ -23,3 +34,4 @@ fn main() -> Result<GameResult, Box<dyn Error>> {
     let input_viewer = InputViewer::new(&mut ctx, app_config)?;
     event::run(ctx, event_loop, input_viewer)
 }
+

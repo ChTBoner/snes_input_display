@@ -61,7 +61,10 @@ impl InputViewer {
     }
 
     fn set_size(ctx: &mut Context, skin: &SkinData) -> Result<(), Box<dyn Error>> {
-        ctx.gfx.set_drawable_size(skin.current_skin.background.width, skin.current_skin.background.height)?;
+        ctx.gfx.set_drawable_size(
+            skin.current_skin.background.width,
+            skin.current_skin.background.height,
+        )?;
         Ok(())
     }
 
@@ -74,14 +77,14 @@ impl InputViewer {
                         if !l.is_empty() {
                             s.attach(&l[0])?;
                             let msg = format!("Attached to {}", &l[0]);
-                            println!("{}", msg);
+                            log::info!("{}", msg);
                         } else {
                             self.error_message =
                                 Some("Not attached to usb2snes compatible endpoint".to_string());
                         }
                     }
                     Err(_) => {
-                        println!("No device available");
+                        log::warn!("No device available");
                         return Ok(Some(s));
                     }
                 }
@@ -131,11 +134,9 @@ impl event::EventHandler for InputViewer {
         } else if ctx.keyboard.is_key_just_released(KeyCode::H) {
             // get previous skin
             match self.skin.get_previous_skin(&mut self.config.skin, ctx) {
-                Ok(_) => {
-                    match InputViewer::set_size(ctx, &self.skin) {
-                        Ok(_) => {},
-                        Err(e) => self.error_message = Some(format!("Error resizing window: {}", e)),
-                    }
+                Ok(_) => match InputViewer::set_size(ctx, &self.skin) {
+                    Ok(_) => {}
+                    Err(e) => self.error_message = Some(format!("Error resizing window: {}", e)),
                 },
                 Err(e) => {
                     self.error_message = Some(format!("Error changing skin: {}", e));
@@ -144,11 +145,9 @@ impl event::EventHandler for InputViewer {
         } else if ctx.keyboard.is_key_just_released(KeyCode::L) {
             // get next skin
             match self.skin.get_next_skin(&mut self.config.skin, ctx) {
-                Ok(_) => {
-                    match InputViewer::set_size(ctx, &self.skin) {
-                        Ok(_) => {},
-                        Err(e) => self.error_message = Some(format!("Error resizing window: {}", e)),
-                    }
+                Ok(_) => match InputViewer::set_size(ctx, &self.skin) {
+                    Ok(_) => {}
+                    Err(e) => self.error_message = Some(format!("Error resizing window: {}", e)),
                 },
                 Err(e) => {
                     self.error_message = Some(format!("Error changing skin: {}", e));
@@ -174,11 +173,9 @@ impl event::EventHandler for InputViewer {
         }
 
         if self.error_message != self.prev_error_message {
-            let deb = match &self.error_message {
-                Some(s) => s,
-                None => "",
-            };
-            println!("{}", deb);
+            if let Some(ref deb) = self.error_message {
+                log::error!("{}", deb);
+            }
             self.prev_error_message = self.error_message.clone();
         }
         let window_title = format!("{} - {}", APP_NAME, self.controller.layout_name);

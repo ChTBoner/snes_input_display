@@ -1,16 +1,18 @@
 use rusb2snes::USB2SnesEndpoint;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use std::fs::{read_to_string, write, File};
+use std::fs::{create_dir_all, read_to_string, write, File};
 use std::path::{Path, PathBuf};
 
 use crate::controller::controller_impl::ControllerConfig;
+use crate::input_viewer::APP_NAME;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct AppConfig {
     pub controller: ControllerConfig,
     pub skin: SkinConfig,
     pub usb2snes: Option<USB2SnesEndpoint>,
+    pub log_path: Option<PathBuf>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -30,9 +32,7 @@ impl AppConfig {
 
         let config_file_path = match path {
             Some(p) => PathBuf::from(p),
-            None => config_dir_path
-                .join("snes-input-display")
-                .join("settings.toml"),
+            None => config_dir_path.join(APP_NAME).join("settings.toml"),
         };
 
         let config_file_path = match config_file_path.to_str() {
@@ -51,8 +51,43 @@ impl AppConfig {
         Ok(config)
     }
 
+    pub fn get_log_path(&self) -> Result<PathBuf, Box<dyn Error>> {
+        if let Some(ref path) = self.log_path {
+            Ok(path.clone())
+        } else {
+            let config_dir_path = dirs::config_local_dir()
+                .ok_or("Can't figure out configuration directory")?;
+            Ok(config_dir_path.join(APP_NAME).join("SnITCH.log"))
+        }
+    }
+
+    pub fn init_logging(&self) -> Result<(), Box<dyn Error>> {
+        let log_path = self.get_log_path()?;
+        if let Some(parent) = log_path.parent() {
+            create_dir_all(parent)?;
+        }
+
+        fern::Dispatch::new()
+            .format(|out, message, record| {
+                out.finish(format_args!(
+                    "[{} {} {}] {}",
+                    chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                    record.level(),
+                    record.target(),
+                    message
+                ))
+            })
+            .level(log::LevelFilter::Info)
+            .chain(std::io::stdout())
+            .chain(fern::log_file(&log_path)?)
+            .apply()?;
+
+        log::info!("Logging initialized. Log file: {}", log_path.display());
+        Ok(())
+    }
+
     fn create_default(path: &str) -> Result<(), Box<dyn Error>> {
-        println!("Creating a new settings file: {path}");
+        log::info!("Creating a new settings file: {path}");
         let documents_dir = match dirs::document_dir() {
             Some(p) => p,
             None => return Err("Could not compute Documents directory".into()),
@@ -60,6 +95,10 @@ impl AppConfig {
         let default_dir = documents_dir.join("snes-input-display");
         let default_inputs_file_path = default_dir.join("inputs_addresses.json");
         let default_skins_dir_path = default_dir.join("skins");
+
+        let default_config_dir = dirs::config_local_dir()
+            .ok_or("Can't figure out configuration directory")?;
+        let default_log_path = default_config_dir.join(APP_NAME).join("SnITCH.log");
 
         let config = AppConfig {
             controller: ControllerConfig {
@@ -72,6 +111,7 @@ impl AppConfig {
                 skin_background: Some("skin_theme".to_string()),
             },
             usb2snes: Some(USB2SnesEndpoint::default()),
+            log_path: Some(default_log_path),
         };
         let toml = toml::to_string(&config)?;
         File::create(path)?;
@@ -79,3 +119,32 @@ impl AppConfig {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_log_path() {
+        let default_config_dir = dirs::config_local_dir().unwrap();
+        let expected = default_config_dir.join(APP_NAME).join("SnITCH.log");
+
+        let config = AppConfig {
+            controller: ControllerConfig {
+                input_config_path: PathBuf::from("test"),
+                layout: "Default".to_string(),
+            },
+            skin: SkinConfig {
+                skins_path: PathBuf::from("test"),
+                skin_name: "test".to_string(),
+                skin_background: None,
+            },
+            usb2snes: None,
+            log_path: None,
+        };
+
+        let log_path = config.get_log_path().unwrap();
+        assert_eq!(log_path, expected);
+    }
+}
+

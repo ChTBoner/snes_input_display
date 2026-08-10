@@ -31,9 +31,16 @@ impl SkinData {
     }
 
     pub fn get_available_skins(path: &PathBuf) -> Result<Vec<String>, Box<dyn Error>> {
-        // read skin.xml file to find if type is snes
         let mut skins: Vec<String> = Vec::new();
-        for entry in std::fs::read_dir(path)? {
+        let entries = std::fs::read_dir(path).map_err(|e| {
+            format!(
+                "Failed to open skins directory at '{}': {}",
+                path.display(),
+                e
+            )
+        })?;
+        for entry in entries {
+
             let entry = entry?;
             if entry.path().is_dir() {
                 let file_to_check = entry.path().join(SKIN_FILE_NAME);

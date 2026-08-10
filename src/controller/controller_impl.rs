@@ -27,8 +27,13 @@ pub struct ControllerData {
 
 impl ControllerData {
     pub fn new(config: &ControllerConfig) -> Result<Self, Box<dyn Error>> {
-        // get path of layouts json from config file
-        let config_data = fs::read_to_string(&config.input_config_path)?;
+        let config_data = fs::read_to_string(&config.input_config_path).map_err(|e| {
+            format!(
+                "Failed to read input addresses file at '{}': {}",
+                config.input_config_path.display(),
+                e
+            )
+        })?;
 
         let available_addresses: ControllerLayouts =
             serde_json::from_str(&config_data)?;

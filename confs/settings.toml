@@ -12,3 +12,6 @@ skin_name = "snes-super-famicom-squabbler"
 # skins_theme = value '<background name> you want to use, found in the theme's xml file' 
 # ex: <background name="Black" image="input-display-overlay-famicom.png" />
 skin_theme = "black"
+
+# log_path: Custom path for log file. Defaults to <config_local_dir>/SniTCH/SnITCH.log
+# log_path = '/path/to/SnITCH.log'
